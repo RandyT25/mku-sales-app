@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MKU · MKS Sales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="sales.css">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MKU·MKS">
+  <meta name="theme-color" content="#C8242A">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="login-screen" class="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-card">
+
+    <div class="login-logos">
+      <div class="login-logo-block">
+        <svg viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+          <defs>
+            <linearGradient id="mkuG" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#D4262B"/>
+              <stop offset="100%" style="stop-color:#8B0000"/>
+            </linearGradient>
+          </defs>
+          <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mkuG)" letter-spacing="-3">mku</text>
+        </svg>
+        <div class="login-logo-sub">PT. Mandala Kriya Utama</div>
+      </div>
+      <div class="login-logo-divider"></div>
+      <div class="login-logo-block">
+        <svg viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+          <defs>
+            <linearGradient id="mksG" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6EC6F5"/>
+              <stop offset="100%" style="stop-color:#1A6FC8"/>
+            </linearGradient>
+          </defs>
+          <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mksG)" letter-spacing="-3">mks</text>
+        </svg>
+        <div class="login-logo-sub">PT. Mandala Kriya Semesta</div>
+      </div>
+    </div>
+
+    <div class="login-portal-label">Sales Team Portal</div>
+
+    <div class="login-select-wrap">
+      <div class="login-select-label">Select your name</div>
+      <div class="login-dropdown-wrap">
+        <select class="login-dropdown" id="rep-select" onchange="onRepSelect(this)">
+          <option value="" disabled selected>— Choose —</option>
+        </select>
+        <svg class="login-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <button class="login-enter-btn" id="login-enter-btn" onclick="doLogin()" disabled>
+        Continue
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="main-app" class="main-app hidden">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" id="back-btn" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="topbar-identity">
+        <div class="topbar-name" id="topbar-name">—</div>
+        <div class="topbar-area" id="topbar-area">—</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date">—</div>
+    </div>
+  </header>
+
+  <!-- SCREENS -->
+  <div class="screens" id="screens">
+
+    <!-- ══ TARGET SCREEN ══ -->
+    <div class="screen active" id="screen-target">
+      <div class="target-hero" id="target-hero"></div>
+      <div class="target-body" id="target-body"></div>
+    </div>
+
+    <!-- ══ PRICELIST SCREEN ══ -->
+    <div class="screen" id="screen-price">
+      <div class="pl-header" id="pl-header">
+        <div class="pl-search-wrap">
+          <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="pl-search" id="pl-search" type="search" placeholder="Search product or brand…" oninput="onSearch(this.value)" autocomplete="off">
+        </div>
+        <div class="pl-divtabs" id="pl-divtabs">
+          <button class="pl-divtab active" onclick="switchDiv('MKU', this)">MKU <span id="mku-count"></span></button>
+          <button class="pl-divtab" onclick="switchDiv('MKS', this)">MKS <span id="mks-count"></span></button>
+        </div>
+        <div class="pl-cats" id="pl-cats"></div>
+      </div>
+      <div class="pl-list" id="pl-list"></div>
+    </div>
+
+    <!-- ══ ORDER SCREEN ══ -->
+    <div class="screen" id="screen-order">
+      <div class="order-meta-bar" id="order-meta-bar">
+        <input class="order-cust-inp" id="order-cust" placeholder="Customer / outlet name…" autocomplete="off">
+        <input class="order-cust-inp" id="order-notes" placeholder="Notes (optional)" autocomplete="off">
+      </div>
+      <div id="order-body"></div>
+    </div>
+
+    <!-- ══ STOCK SCREEN ══ -->
+    <div class="screen" id="screen-stock">
+      <div class="stock-search-bar">
+        <div class="pl-search-wrap" style="margin-bottom:0">
+          <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="pl-search" id="stock-search-inp" type="search" placeholder="Search product name…" oninput="onStockSearch(this.value)" autocomplete="off">
+        </div>
+      </div>
+      <div class="stock-filters" id="stock-filters">
+        <button class="sf active" data-f="all" onclick="filterStock('all',this)">All</button>
+        <button class="sf ok" data-f="ok" onclick="filterStock('ok',this)">✅ In Stock</button>
+        <button class="sf low" data-f="low" onclick="filterStock('low',this)">⚠️ Low</button>
+        <button class="sf critical" data-f="critical" onclick="filterStock('critical',this)">🔴 Critical</button>
+        <button class="sf out" data-f="out" onclick="filterStock('out',this)">❌ Out</button>
+      </div>
+      <div class="stock-divtabs" id="stock-divtabs">
+        <button class="sdiv active" onclick="switchStockDiv('MKU',this)">MKU</button>
+        <button class="sdiv" onclick="switchStockDiv('MKS',this)">MKS</button>
+      </div>
+      <div id="stock-list"></div>
+    </div>
+
+    <!-- ══ CATALOG SCREEN ══ -->
+    <div class="screen" id="screen-catalog">
+      <div class="catalog-wrap">
+        <div class="catalog-header">
+          <div class="catalog-title">Product Catalogs</div>
+          <div class="catalog-sub">Tap to open · Long press to share</div>
+        </div>
+        <a class="catalog-card mku-card" href="MKU Catalog 2026.pdf" target="_blank">
+          <div class="catalog-card-logo">
+            <svg viewBox="0 0 200 72" class="catalog-logo-svg">
+              <defs><linearGradient id="cMKU" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/>
+              </linearGradient></defs>
+              <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKU)" letter-spacing="-3">mku</text>
+            </svg>
+          </div>
+          <div class="catalog-card-info">
+            <div class="catalog-card-name">MKU Catalog 2026</div>
+            <div class="catalog-card-sub">PT. Mandala Kriya Utama · 64 pages</div>
+          </div>
+          <div class="catalog-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+        </a>
+        <a class="catalog-card mks-card" href="MKS Catalog 2026.pdf" target="_blank">
+          <div class="catalog-card-logo">
+            <svg viewBox="0 0 200 72" class="catalog-logo-svg">
+              <defs><linearGradient id="cMKS" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/>
+              </linearGradient></defs>
+              <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKS)" letter-spacing="-3">mks</text>
+            </svg>
+          </div>
+          <div class="catalog-card-info">
+            <div class="catalog-card-name">MKS Catalog 2026</div>
+            <div class="catalog-card-sub">PT. Mandala Kriya Semesta · 45 pages</div>
+          </div>
+          <div class="catalog-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+        </a>
+        <div class="catalog-tip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          To share: open the PDF then use your phone's share button
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bnav active" id="bnav-target" onclick="switchTab('target')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>Target</span>
+    </button>
+    <button class="bnav" id="bnav-price" onclick="switchTab('price')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Pricelist</span>
+    </button>
+    <button class="bnav order-bnav" id="bnav-order" onclick="switchTab('order')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span>Order</span>
+      <div class="order-badge" id="order-badge" style="display:none">0</div>
+    </button>
+    <button class="bnav" id="bnav-stock" onclick="switchTab('stock')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Stock</span>
+    </button>
+    <button class="bnav" id="bnav-catalog" onclick="switchTab('catalog')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Catalog</span>
+    </button>
+  </nav>
+
+</div><!-- /main-app -->
+
+<!-- PRODUCT MODAL -->
+<div class="overlay hidden" id="prod-overlay" onclick="closeProdModal(event)">
+  <div class="prod-modal" id="prod-modal">
+    <div class="pm-handle"></div>
+    <div class="pm-badge" id="pm-badge"></div>
+    <div class="pm-name" id="pm-name"></div>
+    <div class="pm-stock-bar" id="pm-stock-bar"></div>
+    <div class="pm-tiers" id="pm-tiers"></div>
+    <div class="pm-details" id="pm-details"></div>
+    <div class="pm-actions">
+      <button class="pm-btn-wa" onclick="shareProductWA()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share
+      </button>
+      <button class="pm-btn-add" onclick="addToOrder()">+ Add to Order</button>
+      <button class="pm-btn-close" onclick="closeProdModalBtn()">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="products.js"></script>
+<script src="stock_map.js"></script>
+<script>
+// ── FETCH data.js FROM DASHBOARD REPO ──
+const DATA_URL = 'https://raw.githubusercontent.com/randyt25/MKU-MKS-Area-Dashboard/main/data.js';
+
+(function loadData() {
+  // Show loading state
+  document.getElementById('login-screen').innerHTML = `
+    <div class="login-bg"></div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px">
+      <div style="display:flex;align-items:center;gap:0">
+        <svg viewBox="0 0 200 72" style="width:80px;height:28px"><defs><linearGradient id="lG1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#lG1)" letter-spacing="-3">mku</text></svg>
+        <div style="width:1px;height:32px;background:rgba(255,255,255,0.15);margin:0 10px"></div>
+        <svg viewBox="0 0 200 72" style="width:80px;height:28px"><defs><linearGradient id="lG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#lG2)" letter-spacing="-3">mks</text></svg>
+      </div>
+      <div style="color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">Loading latest data…</div>
+      <div class="load-spinner"></div>
+    </div>`;
+
+  fetch(DATA_URL)
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(text => {
+      // Execute the data.js content to define RAW
+      const script = document.createElement('script');
+      script.textContent = text;
+      document.head.appendChild(script);
+      // Now load and run the app
+      const appScript = document.createElement('script');
+      appScript.src = 'sales.js';
+      document.body.appendChild(appScript);
+    })
+    .catch(err => {
+      console.warn('Remote fetch failed, trying local fallback:', err);
+      // Fallback: try local data.js (for offline / testing)
+      const fallback = document.createElement('script');
+      fallback.src = 'data.js';
+      fallback.onload = () => {
+        const appScript = document.createElement('script');
+        appScript.src = 'sales.js';
+        document.body.appendChild(appScript);
+      };
+      fallback.onerror = () => {
+        document.getElementById('login-screen').innerHTML += `
+          <div style="position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#C8242A;color:white;padding:12px 20px;border-radius:12px;font-size:.8rem;text-align:center;max-width:280px">
+            Could not load data.<br>Check your internet connection.
+          </div>`;
+      };
+      document.body.appendChild(fallback);
+    });
+})();
+</script>
+<!-- ── INSTALL BANNER ── -->
+<div class="install-banner hidden" id="install-banner">
+  <img src="logo-mku-mks.png" class="install-logo" alt="MKU MKS">
+  <div class="install-text">
+    <div class="install-title">Install Sales App</div>
+    <div class="install-sub">Add to your home screen for quick access</div>
+  </div>
+  <button class="install-btn" id="install-btn">Install</button>
+  <button class="install-dismiss" id="install-dismiss">✕</button>
+</div>
+
+<!-- ── REGISTER SERVICE WORKER ── -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+
+// ── INSTALL PROMPT ──
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show banner after a short delay
+  setTimeout(() => {
+    const banner = document.getElementById('install-banner');
+    if (banner) banner.classList.remove('hidden');
+  }, 3000);
+});
+
+document.getElementById('install-btn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').classList.add('hidden');
+});
+
+document.getElementById('install-dismiss')?.addEventListener('click', () => {
+  document.getElementById('install-banner').classList.add('hidden');
+  // Don't show again for this session
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner')?.classList.add('hidden');
+});
+</script>
+</body>
+</html>
