@@ -1,4 +1,6 @@
-const CACHE = 'mku-mks-sales-v1';
+// Cache version — update this string any time you change app files
+const CACHE = 'mku-mks-v' + new Date().toISOString().slice(0, 10);
+
 const STATIC = [
   '/mku-sales-app/',
   '/mku-sales-app/index.html',
@@ -7,28 +9,37 @@ const STATIC = [
   '/mku-sales-app/products.js',
   '/mku-sales-app/stock_map.js',
   '/mku-sales-app/manifest.json',
-  '/mku-sales-app/icon-192.png',
-  '/mku-sales-app/icon-512.png',
   '/mku-sales-app/logo-mku-mks.png',
+  '/mku-sales-app/icon-192.png',
 ];
 
+// Install — cache static files
 self.addEventListener('install', e => {
+  self.skipWaiting(); // activate immediately
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(STATIC)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(c => c.addAll(STATIC))
   );
 });
 
+// Activate — delete old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(
+        keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
+// Fetch strategy:
+// - data_sales.js and data.js → always network first (must be fresh)
+// - everything else → cache first
 self.addEventListener('fetch', e => {
-  // For data.js (dashboard repo) — network first, fallback to cache
-  if (e.request.url.includes('raw.githubusercontent.com')) {
+  const url = e.request.url;
+
+  // Always fetch data files fresh from network
+  if (url.includes('data_sales.js') || url.includes('data.js')) {
     e.respondWith(
       fetch(e.request)
         .then(res => {
@@ -40,8 +51,10 @@ self.addEventListener('fetch', e => {
     );
     return;
   }
-  // For everything else — cache first, fallback to network
+
+  // Cache first for everything else
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    caches.match(e.request)
+      .then(cached => cached || fetch(e.request))
   );
 });
