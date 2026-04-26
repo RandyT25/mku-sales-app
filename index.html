@@ -251,12 +251,8 @@
 <script src="stock_map.js"></script>
 <script>
 // ── FETCH data.js FROM DASHBOARD REPO ──
-// jsDelivr serves GitHub files with correct CORS headers
-// ?t= cache buster ensures we always get today's file
-const DATA_URL = 'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js?t=' + new Date().toISOString().slice(0,10);
-
 (function loadData() {
-  // Show loading state
+  // Render loading screen
   document.getElementById('login-screen').innerHTML = `
     <div class="login-bg"></div>
     <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px">
@@ -265,43 +261,42 @@ const DATA_URL = 'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js?t=' 
         <div style="width:1px;height:32px;background:rgba(255,255,255,0.15);margin:0 10px"></div>
         <svg viewBox="0 0 200 72" style="width:80px;height:28px"><defs><linearGradient id="lG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#lG2)" letter-spacing="-3">mks</text></svg>
       </div>
-      <div style="color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">Loading latest data…</div>
+      <div class="load-msg" style="color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">Loading…</div>
       <div class="load-spinner"></div>
+      <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
     </div>`;
 
-  fetch(DATA_URL)
-    .then(r => {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.text();
-    })
-    .then(text => {
-      // Execute the data.js content to define RAW
-      const script = document.createElement('script');
-      script.textContent = text;
-      document.head.appendChild(script);
-      // Now load and run the app
+  let prog = 0;
+  const barTimer = setInterval(() => {
+    prog = Math.min(prog + (Math.random() * 6), 85);
+    const b = document.getElementById('load-bar');
+    if (b) b.style.width = prog + '%';
+  }, 400);
+
+  // Inject data.js as a <script> tag — avoids all CORS issues
+  const dataScript = document.createElement('script');
+  dataScript.src = 'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js?v=' + new Date().toISOString().slice(0,10);
+
+  dataScript.onload = function() {
+    clearInterval(barTimer);
+    const b = document.getElementById('load-bar');
+    if (b) b.style.width = '100%';
+    setTimeout(() => {
       const appScript = document.createElement('script');
       appScript.src = 'sales.js';
       document.body.appendChild(appScript);
-    })
-    .catch(err => {
-      console.warn('Remote fetch failed, trying local fallback:', err);
-      // Fallback: try local data.js (for offline / testing)
-      const fallback = document.createElement('script');
-      fallback.src = 'data.js';
-      fallback.onload = () => {
-        const appScript = document.createElement('script');
-        appScript.src = 'sales.js';
-        document.body.appendChild(appScript);
-      };
-      fallback.onerror = () => {
-        document.getElementById('login-screen').innerHTML += `
-          <div style="position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#C8242A;color:white;padding:12px 20px;border-radius:12px;font-size:.8rem;text-align:center;max-width:280px">
-            Could not load data.<br>Check your internet connection.
-          </div>`;
-      };
-      document.body.appendChild(fallback);
-    });
+    }, 150);
+  };
+
+  dataScript.onerror = function() {
+    clearInterval(barTimer);
+    const el = document.querySelector('.load-msg');
+    if (el) { el.textContent = 'Failed to load data — check connection'; el.style.color = '#F08080'; }
+    const b = document.getElementById('load-bar');
+    if (b) { b.style.background = '#C8242A'; b.style.width = '100%'; }
+  };
+
+  document.head.appendChild(dataScript);
 })();
 </script>
 <!-- ── INSTALL BANNER ── -->
