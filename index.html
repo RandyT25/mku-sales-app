@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MKU · MKS Sales</title>
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="shortcut icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="sales.css">
@@ -15,8 +17,6 @@
   <meta name="apple-mobile-web-app-title" content="MKU·MKS">
   <meta name="theme-color" content="#C8242A">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
 </head>
 <body>
 
@@ -24,37 +24,10 @@
 <div id="login-screen" class="login-screen">
   <div class="login-bg"></div>
   <div class="login-card">
-
     <div class="login-logos">
-      <div class="login-logo-block">
-        <svg viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
-          <defs>
-            <linearGradient id="mkuG" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style="stop-color:#D4262B"/>
-              <stop offset="100%" style="stop-color:#8B0000"/>
-            </linearGradient>
-          </defs>
-          <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mkuG)" letter-spacing="-3">mku</text>
-        </svg>
-        <div class="login-logo-sub">PT. Mandala Kriya Utama</div>
-      </div>
-      <div class="login-logo-divider"></div>
-      <div class="login-logo-block">
-        <svg viewBox="0 0 200 72" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
-          <defs>
-            <linearGradient id="mksG" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#6EC6F5"/>
-              <stop offset="100%" style="stop-color:#1A6FC8"/>
-            </linearGradient>
-          </defs>
-          <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mksG)" letter-spacing="-3">mks</text>
-        </svg>
-        <div class="login-logo-sub">PT. Mandala Kriya Semesta</div>
-      </div>
+      <img src="logo-mku-mks.png" class="login-combined-logo" alt="MKU MKS">
     </div>
-
     <div class="login-portal-label">Sales Team Portal</div>
-
     <div class="login-select-wrap">
       <div class="login-select-label">Select your name</div>
       <div class="login-dropdown-wrap">
@@ -68,14 +41,12 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
     </div>
-
   </div>
 </div>
 
 <!-- ── MAIN APP ── -->
 <div id="main-app" class="main-app hidden">
 
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="topbar-left">
       <button class="back-btn" id="back-btn" onclick="logout()">
@@ -91,16 +62,15 @@
     </div>
   </header>
 
-  <!-- SCREENS -->
   <div class="screens" id="screens">
 
-    <!-- ══ TARGET SCREEN ══ -->
+    <!-- TARGET -->
     <div class="screen active" id="screen-target">
       <div class="target-hero" id="target-hero"></div>
       <div class="target-body" id="target-body"></div>
     </div>
 
-    <!-- ══ PRICELIST SCREEN ══ -->
+    <!-- PRICELIST -->
     <div class="screen" id="screen-price">
       <div class="pl-header" id="pl-header">
         <div class="pl-search-wrap">
@@ -116,7 +86,7 @@
       <div class="pl-list" id="pl-list"></div>
     </div>
 
-    <!-- ══ ORDER SCREEN ══ -->
+    <!-- ORDER -->
     <div class="screen" id="screen-order">
       <div class="order-meta-bar" id="order-meta-bar">
         <input class="order-cust-inp" id="order-cust" placeholder="Customer / outlet name…" autocomplete="off">
@@ -125,7 +95,7 @@
       <div id="order-body"></div>
     </div>
 
-    <!-- ══ STOCK SCREEN ══ -->
+    <!-- STOCK -->
     <div class="screen" id="screen-stock">
       <div class="stock-search-bar">
         <div class="pl-search-wrap" style="margin-bottom:0">
@@ -147,12 +117,12 @@
       <div id="stock-list"></div>
     </div>
 
-    <!-- ══ CATALOG SCREEN ══ -->
+    <!-- CATALOG -->
     <div class="screen" id="screen-catalog">
       <div class="catalog-wrap">
         <div class="catalog-header">
           <div class="catalog-title">Product Catalogs</div>
-          <div class="catalog-sub">Tap to open · Long press to share</div>
+          <div class="catalog-sub">Tap to open · Use phone share button to share</div>
         </div>
         <a class="catalog-card mku-card" href="MKU Catalog 2026.pdf" target="_blank">
           <div class="catalog-card-logo">
@@ -197,7 +167,6 @@
 
   </div><!-- /screens -->
 
-  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="bnav active" id="bnav-target" onclick="switchTab('target')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
@@ -250,21 +219,19 @@
 <script src="products.js"></script>
 <script src="stock_map.js"></script>
 <script>
-// ── FETCH data.js FROM DASHBOARD REPO ──
 (function loadData() {
+
+  // ── LOADING SCREEN ──
   document.getElementById('login-screen').innerHTML = `
     <div class="login-bg"></div>
-    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px">
-      <div style="display:flex;align-items:center;gap:0">
-        <svg viewBox="0 0 200 72" style="width:80px;height:28px"><defs><linearGradient id="lG1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#lG1)" letter-spacing="-3">mku</text></svg>
-        <div style="width:1px;height:32px;background:rgba(255,255,255,0.15);margin:0 10px"></div>
-        <svg viewBox="0 0 200 72" style="width:80px;height:28px"><defs><linearGradient id="lG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#lG2)" letter-spacing="-3">mks</text></svg>
-      </div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;padding:24px">
+      <img src="logo-mku-mks.png" style="width:200px;max-width:80%;object-fit:contain;margin-bottom:8px" onerror="this.style.display='none'">
       <div class="load-msg" style="color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">Loading…</div>
       <div class="load-spinner"></div>
       <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
     </div>`;
 
+  // ── HELPERS ──
   function animateBar() {
     let p = 0;
     return setInterval(() => {
@@ -274,23 +241,12 @@
     }, 400);
   }
 
-  function launchApp() {
-    const b = document.getElementById('load-bar');
-    if (b) b.style.width = '100%';
-    // Restore the real login screen before loading app
+  function restoreLogin() {
     document.getElementById('login-screen').innerHTML = `
       <div class="login-bg"></div>
       <div class="login-card">
         <div class="login-logos">
-          <div class="login-logo-block">
-            <svg viewBox="0 0 200 72" class="logo-svg"><defs><linearGradient id="mkuG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mkuG)" letter-spacing="-3">mku</text></svg>
-            <div class="login-logo-sub">PT. Mandala Kriya Utama</div>
-          </div>
-          <div class="login-logo-divider"></div>
-          <div class="login-logo-block">
-            <svg viewBox="0 0 200 72" class="logo-svg"><defs><linearGradient id="mksG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mksG)" letter-spacing="-3">mks</text></svg>
-            <div class="login-logo-sub">PT. Mandala Kriya Semesta</div>
-          </div>
+          <img src="logo-mku-mks.png" class="login-combined-logo" alt="MKU MKS" onerror="this.style.display='none'">
         </div>
         <div class="login-portal-label">Sales Team Portal</div>
         <div class="login-select-wrap">
@@ -307,12 +263,20 @@
           </button>
         </div>
       </div>`;
+  }
+
+  function launchApp(timer) {
+    clearInterval(timer);
+    const b = document.getElementById('load-bar');
+    if (b) b.style.width = '100%';
+    restoreLogin();
     const s = document.createElement('script');
     s.src = 'sales.js';
     document.body.appendChild(s);
   }
 
-  function showError(msg) {
+  function showError(timer, msg) {
+    clearInterval(timer);
     const el = document.querySelector('.load-msg');
     if (el) { el.textContent = msg; el.style.color = '#F08080'; }
     const b = document.getElementById('load-bar');
@@ -329,23 +293,25 @@
 
   const timer = animateBar();
 
-  // Try slim file first, fall back to full file
+  // Try slim file first, fall back to full data.js
   loadScript(
     'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js',
-    function() { clearInterval(timer); launchApp(); },
+    function() { launchApp(timer); },
     function() {
       const el = document.querySelector('.load-msg');
       if (el) el.textContent = 'Loading full data…';
       loadScript(
         'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js',
-        function() { clearInterval(timer); launchApp(); },
-        function() { clearInterval(timer); showError('Failed to load — check connection'); }
+        function() { launchApp(timer); },
+        function() { showError(timer, 'Failed to load — check connection'); }
       );
     }
   );
+
 })();
 </script>
-<!-- ── INSTALL BANNER ── -->
+
+<!-- INSTALL BANNER -->
 <div class="install-banner hidden" id="install-banner">
   <img src="logo-mku-mks.png" class="install-logo" alt="MKU MKS">
   <div class="install-text">
@@ -356,43 +322,32 @@
   <button class="install-dismiss" id="install-dismiss">✕</button>
 </div>
 
-<!-- ── REGISTER SERVICE WORKER ── -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(r => console.log('SW registered'))
-      .catch(e => console.log('SW error:', e));
+    navigator.serviceWorker.register('sw.js').catch(e => console.log('SW error:', e));
   });
 }
-
-// ── INSTALL PROMPT ──
 let deferredPrompt = null;
-
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  // Show banner after a short delay
   setTimeout(() => {
     const banner = document.getElementById('install-banner');
     if (banner) banner.classList.remove('hidden');
   }, 3000);
 });
-
 document.getElementById('install-btn')?.addEventListener('click', async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
+  await deferredPrompt.userChoice;
   deferredPrompt = null;
   document.getElementById('install-banner').classList.add('hidden');
 });
-
 document.getElementById('install-dismiss')?.addEventListener('click', () => {
   document.getElementById('install-banner').classList.add('hidden');
-  // Don't show again for this session
   deferredPrompt = null;
 });
-
 window.addEventListener('appinstalled', () => {
   document.getElementById('install-banner')?.classList.add('hidden');
 });
