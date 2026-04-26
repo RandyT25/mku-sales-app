@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MKU · MKS Sales</title>
   <link rel="icon" type="image/png" href="icon-192.png">
-  <link rel="shortcut icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="sales.css">
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,36 +18,23 @@
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ── -->
+<!-- LOGIN — starts as loading screen, replaced by real login after data loads -->
 <div id="login-screen" class="login-screen">
   <div class="login-bg"></div>
-  <div class="login-card">
-    <div class="login-logos">
-      <img src="logo-mku-mks.png" class="login-combined-logo" alt="MKU MKS">
-    </div>
-    <div class="login-portal-label">Sales Team Portal</div>
-    <div class="login-select-wrap">
-      <div class="login-select-label">Select your name</div>
-      <div class="login-dropdown-wrap">
-        <select class="login-dropdown" id="rep-select" onchange="onRepSelect(this)">
-          <option value="" disabled selected>— Choose —</option>
-        </select>
-        <svg class="login-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <button class="login-enter-btn" id="login-enter-btn" onclick="doLogin()" disabled>
-        Continue
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </div>
+  <div id="login-inner" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;padding:24px">
+    <img src="logo-mku-mks.png" style="width:200px;max-width:80%;object-fit:contain;margin-bottom:8px" onerror="this.style.display='none'">
+    <div id="load-msg" style="color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">Loading…</div>
+    <div class="load-spinner"></div>
+    <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
   </div>
 </div>
 
-<!-- ── MAIN APP ── -->
+<!-- MAIN APP — hidden until rep logs in -->
 <div id="main-app" class="main-app hidden">
 
   <header class="topbar">
     <div class="topbar-left">
-      <button class="back-btn" id="back-btn" onclick="logout()">
+      <button class="back-btn" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <div class="topbar-identity">
@@ -64,13 +49,11 @@
 
   <div class="screens" id="screens">
 
-    <!-- TARGET -->
     <div class="screen active" id="screen-target">
       <div class="target-hero" id="target-hero"></div>
       <div class="target-body" id="target-body"></div>
     </div>
 
-    <!-- PRICELIST -->
     <div class="screen" id="screen-price">
       <div class="pl-header" id="pl-header">
         <div class="pl-search-wrap">
@@ -86,16 +69,14 @@
       <div class="pl-list" id="pl-list"></div>
     </div>
 
-    <!-- ORDER -->
     <div class="screen" id="screen-order">
-      <div class="order-meta-bar" id="order-meta-bar">
+      <div class="order-meta-bar">
         <input class="order-cust-inp" id="order-cust" placeholder="Customer / outlet name…" autocomplete="off">
         <input class="order-cust-inp" id="order-notes" placeholder="Notes (optional)" autocomplete="off">
       </div>
       <div id="order-body"></div>
     </div>
 
-    <!-- STOCK -->
     <div class="screen" id="screen-stock">
       <div class="stock-search-bar">
         <div class="pl-search-wrap" style="margin-bottom:0">
@@ -103,21 +84,20 @@
           <input class="pl-search" id="stock-search-inp" type="search" placeholder="Search product name…" oninput="onStockSearch(this.value)" autocomplete="off">
         </div>
       </div>
-      <div class="stock-filters" id="stock-filters">
-        <button class="sf active" data-f="all" onclick="filterStock('all',this)">All</button>
-        <button class="sf ok" data-f="ok" onclick="filterStock('ok',this)">✅ In Stock</button>
-        <button class="sf low" data-f="low" onclick="filterStock('low',this)">⚠️ Low</button>
-        <button class="sf critical" data-f="critical" onclick="filterStock('critical',this)">🔴 Critical</button>
-        <button class="sf out" data-f="out" onclick="filterStock('out',this)">❌ Out</button>
+      <div class="stock-filters">
+        <button class="sf active" onclick="filterStock('all',this)">All</button>
+        <button class="sf ok" onclick="filterStock('ok',this)">✅ In Stock</button>
+        <button class="sf low" onclick="filterStock('low',this)">⚠️ Low</button>
+        <button class="sf critical" onclick="filterStock('critical',this)">🔴 Critical</button>
+        <button class="sf out" onclick="filterStock('out',this)">❌ Out</button>
       </div>
-      <div class="stock-divtabs" id="stock-divtabs">
+      <div class="stock-divtabs">
         <button class="sdiv active" onclick="switchStockDiv('MKU',this)">MKU</button>
         <button class="sdiv" onclick="switchStockDiv('MKS',this)">MKS</button>
       </div>
       <div id="stock-list"></div>
     </div>
 
-    <!-- CATALOG -->
     <div class="screen" id="screen-catalog">
       <div class="catalog-wrap">
         <div class="catalog-header">
@@ -126,12 +106,7 @@
         </div>
         <a class="catalog-card mku-card" href="MKU Catalog 2026.pdf" target="_blank">
           <div class="catalog-card-logo">
-            <svg viewBox="0 0 200 72" class="catalog-logo-svg">
-              <defs><linearGradient id="cMKU" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/>
-              </linearGradient></defs>
-              <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKU)" letter-spacing="-3">mku</text>
-            </svg>
+            <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKU" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKU)" letter-spacing="-3">mku</text></svg>
           </div>
           <div class="catalog-card-info">
             <div class="catalog-card-name">MKU Catalog 2026</div>
@@ -143,12 +118,7 @@
         </a>
         <a class="catalog-card mks-card" href="MKS Catalog 2026.pdf" target="_blank">
           <div class="catalog-card-logo">
-            <svg viewBox="0 0 200 72" class="catalog-logo-svg">
-              <defs><linearGradient id="cMKS" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/>
-              </linearGradient></defs>
-              <text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKS)" letter-spacing="-3">mks</text>
-            </svg>
+            <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKS" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKS)" letter-spacing="-3">mks</text></svg>
           </div>
           <div class="catalog-card-info">
             <div class="catalog-card-name">MKS Catalog 2026</div>
@@ -165,7 +135,7 @@
       </div>
     </div>
 
-  </div><!-- /screens -->
+  </div>
 
   <nav class="bottom-nav">
     <button class="bnav active" id="bnav-target" onclick="switchTab('target')">
@@ -191,7 +161,7 @@
     </button>
   </nav>
 
-</div><!-- /main-app -->
+</div>
 
 <!-- PRODUCT MODAL -->
 <div class="overlay hidden" id="prod-overlay" onclick="closeProdModal(event)">
@@ -213,106 +183,88 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script src="products.js"></script>
 <script src="stock_map.js"></script>
 <script>
-(function loadData() {
+// ── STEP 1: Animate the loading bar ──
+let _barTimer = (function() {
+  let p = 0;
+  return setInterval(() => {
+    p = Math.min(p + Math.random() * 6, 85);
+    const b = document.getElementById('load-bar');
+    if (b) b.style.width = p + '%';
+  }, 400);
+})();
 
-  // ── LOADING SCREEN ──
+// ── STEP 2: Load data, then load app ──
+function _loadScript(url, ok, fail) {
+  const s = document.createElement('script');
+  s.src = url;
+  s.onload = ok;
+  s.onerror = fail;
+  document.head.appendChild(s);
+}
+
+function _showLogin() {
+  // Replace loading screen with real login UI
   document.getElementById('login-screen').innerHTML = `
     <div class="login-bg"></div>
-    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;padding:24px">
-      <img src="logo-mku-mks.png" style="width:200px;max-width:80%;object-fit:contain;margin-bottom:8px" onerror="this.style.display='none'">
-      <div class="load-msg" style="color:rgba(255,255,255,0.5);font-size:.75rem;letter-spacing:1px;text-transform:uppercase">Loading…</div>
-      <div class="load-spinner"></div>
-      <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
+    <div class="login-card">
+      <div class="login-logos">
+        <img src="logo-mku-mks.png" class="login-combined-logo" alt="MKU MKS" onerror="this.style.display='none'">
+      </div>
+      <div class="login-portal-label">Sales Team Portal</div>
+      <div class="login-select-wrap">
+        <div class="login-select-label">Select your name</div>
+        <div class="login-dropdown-wrap">
+          <select class="login-dropdown" id="rep-select" onchange="onRepSelect(this)">
+            <option value="" disabled selected>— Choose —</option>
+          </select>
+          <svg class="login-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <button class="login-enter-btn" id="login-enter-btn" onclick="doLogin()" disabled>
+          Continue
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
     </div>`;
+  // Now populate the dropdown
+  buildLogin();
+}
 
-  // ── HELPERS ──
-  function animateBar() {
-    let p = 0;
-    return setInterval(() => {
-      p = Math.min(p + Math.random() * 6, 85);
-      const b = document.getElementById('load-bar');
-      if (b) b.style.width = p + '%';
-    }, 400);
-  }
+function _dataLoaded() {
+  clearInterval(_barTimer);
+  const b = document.getElementById('load-bar');
+  if (b) b.style.width = '100%';
+  // Load the app JS, then show login
+  _loadScript('sales.js', _showLogin, function() {
+    document.getElementById('load-msg').textContent = 'App failed to load — try refreshing';
+    document.getElementById('load-msg').style.color = '#F08080';
+  });
+}
 
-  function restoreLogin() {
-    document.getElementById('login-screen').innerHTML = `
-      <div class="login-bg"></div>
-      <div class="login-card">
-        <div class="login-logos">
-          <img src="logo-mku-mks.png" class="login-combined-logo" alt="MKU MKS" onerror="this.style.display='none'">
-        </div>
-        <div class="login-portal-label">Sales Team Portal</div>
-        <div class="login-select-wrap">
-          <div class="login-select-label">Select your name</div>
-          <div class="login-dropdown-wrap">
-            <select class="login-dropdown" id="rep-select" onchange="onRepSelect(this)">
-              <option value="" disabled selected>— Choose —</option>
-            </select>
-            <svg class="login-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
-          <button class="login-enter-btn" id="login-enter-btn" onclick="doLogin()" disabled>
-            Continue
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-      </div>`;
-  }
-
-  function launchApp(timer) {
-    clearInterval(timer);
-    const b = document.getElementById('load-bar');
-    if (b) b.style.width = '100%';
-    restoreLogin();
-    const s = document.createElement('script');
-    s.src = 'sales.js';
-    s.onload = function() {
-      // Populate the dropdown after sales.js is ready
-      if (typeof buildLogin === 'function') buildLogin();
-    };
-    document.body.appendChild(s);
-  }
-
-  function showError(timer, msg) {
-    clearInterval(timer);
-    const el = document.querySelector('.load-msg');
-    if (el) { el.textContent = msg; el.style.color = '#F08080'; }
-    const b = document.getElementById('load-bar');
-    if (b) { b.style.background = '#C8242A'; b.style.width = '100%'; }
-  }
-
-  function loadScript(url, onSuccess, onFail) {
-    const s = document.createElement('script');
-    s.src = url;
-    s.onload = onSuccess;
-    s.onerror = onFail;
-    document.head.appendChild(s);
-  }
-
-  const timer = animateBar();
-
-  // Try slim file first, fall back to full data.js
-  loadScript(
-    'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js',
-    function() { launchApp(timer); },
+function _dataFailed() {
+  const el = document.getElementById('load-msg');
+  if (el) { el.textContent = 'Loading full data…'; }
+  _loadScript(
+    'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js',
+    _dataLoaded,
     function() {
-      const el = document.querySelector('.load-msg');
-      if (el) el.textContent = 'Loading full data…';
-      loadScript(
-        'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js',
-        function() { launchApp(timer); },
-        function() { showError(timer, 'Failed to load — check connection'); }
-      );
+      clearInterval(_barTimer);
+      const el = document.getElementById('load-msg');
+      if (el) { el.textContent = 'Failed to load — check connection'; el.style.color = '#F08080'; }
     }
   );
+}
 
-})();
+// Try slim file first
+_loadScript(
+  'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js',
+  _dataLoaded,
+  _dataFailed
+);
 </script>
 
 <!-- INSTALL BANNER -->
@@ -329,7 +281,7 @@
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(e => console.log('SW error:', e));
+    navigator.serviceWorker.register('sw.js').catch(e => console.log('SW:', e));
   });
 }
 let deferredPrompt = null;
@@ -337,9 +289,9 @@ window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
   setTimeout(() => {
-    const banner = document.getElementById('install-banner');
-    if (banner) banner.classList.remove('hidden');
-  }, 3000);
+    const b = document.getElementById('install-banner');
+    if (b) b.classList.remove('hidden');
+  }, 4000);
 });
 document.getElementById('install-btn')?.addEventListener('click', async () => {
   if (!deferredPrompt) return;
@@ -350,7 +302,6 @@ document.getElementById('install-btn')?.addEventListener('click', async () => {
 });
 document.getElementById('install-dismiss')?.addEventListener('click', () => {
   document.getElementById('install-banner').classList.add('hidden');
-  deferredPrompt = null;
 });
 window.addEventListener('appinstalled', () => {
   document.getElementById('install-banner')?.classList.add('hidden');
