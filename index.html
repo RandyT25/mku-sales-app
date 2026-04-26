@@ -289,11 +289,28 @@
   };
 
   dataScript.onerror = function() {
-    clearInterval(barTimer);
+    // data_sales.js not found — fall back to full data.js
+    console.warn('data_sales.js not found, falling back to data.js...');
     const el = document.querySelector('.load-msg');
-    if (el) { el.textContent = 'Failed to load data — check connection'; el.style.color = '#F08080'; }
-    const b = document.getElementById('load-bar');
-    if (b) { b.style.background = '#C8242A'; b.style.width = '100%'; }
+    if (el) el.textContent = 'Loading full data…';
+    const fallback = document.createElement('script');
+    fallback.src = 'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js?v=' + new Date().toISOString().slice(0,10);
+    fallback.onload = function() {
+      clearInterval(barTimer);
+      const b = document.getElementById('load-bar');
+      if (b) b.style.width = '100%';
+      setTimeout(() => {
+        const appScript = document.createElement('script');
+        appScript.src = 'sales.js';
+        document.body.appendChild(appScript);
+      }, 150);
+    };
+    fallback.onerror = function() {
+      clearInterval(barTimer);
+      const el = document.querySelector('.load-msg');
+      if (el) { el.textContent = 'Failed to load data — check connection'; el.style.color = '#F08080'; }
+    };
+    document.head.appendChild(fallback);
   };
 
   document.head.appendChild(dataScript);
