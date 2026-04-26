@@ -800,5 +800,5 @@ function renderStock() {
 }
 
 // ── INIT ──
-// Called by launchApp() in index.html after data loads
-buildLogin();
+// buildLogin() is called by index.html after data loads and login HTML is ready
+// Do NOT call it here — rep-select does not exist yet at this point

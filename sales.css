@@ -39,6 +39,8 @@ input { font-family: var(--sans); }
   display: flex; align-items: center; justify-content: center;
   background: #0A0A0F;
   padding: 24px 28px;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 .login-bg {
   position: absolute; inset: 0;
@@ -121,7 +123,12 @@ input { font-family: var(--sans); }
 .login-enter-btn:not(:disabled):active { transform: scale(0.97); opacity: 0.9; }
 
 /* ── MAIN APP LAYOUT ── */
-.main-app { display: flex; flex-direction: column; height: 100vh; }
+.main-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh; /* dynamic viewport height — fixes iOS Safari chrome overlap */
+}
 
 /* ── TOPBAR ── */
 .topbar {
