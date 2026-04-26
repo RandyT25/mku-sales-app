@@ -616,3 +616,70 @@ input { font-family: var(--sans); }
   font-size: .75rem; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
 }
+
+/* ── LOAD PROGRESS BAR ── */
+.load-bar-wrap {
+  width: 200px; height: 3px; background: rgba(255,255,255,0.1);
+  border-radius: 2px; overflow: hidden;
+}
+.load-bar {
+  height: 100%; width: 0%; background: var(--red);
+  border-radius: 2px; transition: width 0.3s ease;
+}
+
+/* ── COMBINED LOGO ── */
+.login-combined-logo {
+  width: 260px;
+  max-width: 90%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ── MOBILE FONT SCALE-DOWN ── */
+@media (max-width: 420px) {
+  :root { font-size: 14px; }
+
+  /* Topbar */
+  .topbar-name { font-size: .82rem; }
+  .topbar-area { font-size: .62rem; }
+
+  /* Target hero */
+  .th-pct { font-size: 2.4rem; }
+  .th-mini-val { font-size: .75rem; }
+  .th-mini-label { font-size: .58rem; }
+  .th-mini-pct { font-size: .6rem; }
+  .th-rep { font-size: 1.1rem; }
+  .th-month { font-size: .65rem; }
+  .th-status-tag { font-size: .65rem; }
+
+  /* Cards */
+  .gc-val { font-size: .82rem; }
+  .gc-label { font-size: .65rem; }
+  .gc-sub { font-size: .6rem; }
+  .ac-name { font-size: .75rem; }
+  .ac-area { font-size: .62rem; }
+  .ac-pct { font-size: .72rem; }
+  .mc-bar-label { font-size: .72rem; }
+  .mc-bar-nums { font-family: var(--mono); font-size: .65rem; }
+
+  /* Pricelist */
+  .pl-card-name { font-size: .75rem; }
+  .pl-card-price-val { font-size: .75rem; }
+  .pl-card-tag { font-size: .58rem; }
+
+  /* Order */
+  .oi-name { font-size: .75rem; }
+  .oi-tier { font-size: .62rem; }
+  .oi-price-total { font-size: .75rem; }
+  .os-row.total span:last-child { font-size: .9rem; }
+
+  /* Stock */
+  .sk-name { font-size: .75rem; }
+  .sk-qty { font-size: .82rem; }
+
+  /* Bottom nav */
+  .bnav { font-size: .6rem; }
+  .bnav svg { width: 20px; height: 20px; }
+}
