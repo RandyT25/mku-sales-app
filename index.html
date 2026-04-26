@@ -252,7 +252,6 @@
 <script>
 // ── FETCH data.js FROM DASHBOARD REPO ──
 (function loadData() {
-  // Render loading screen
   document.getElementById('login-screen').innerHTML = `
     <div class="login-bg"></div>
     <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px">
@@ -266,54 +265,54 @@
       <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
     </div>`;
 
-  let prog = 0;
-  const barTimer = setInterval(() => {
-    prog = Math.min(prog + (Math.random() * 6), 85);
-    const b = document.getElementById('load-bar');
-    if (b) b.style.width = prog + '%';
-  }, 400);
+  function animateBar() {
+    let p = 0;
+    return setInterval(() => {
+      p = Math.min(p + Math.random() * 6, 85);
+      const b = document.getElementById('load-bar');
+      if (b) b.style.width = p + '%';
+    }, 400);
+  }
 
-  // Inject data.js as a <script> tag — avoids all CORS issues
-  const dataScript = document.createElement('script');
-  dataScript.src = 'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js?v=' + new Date().toISOString().slice(0,10);
-
-  dataScript.onload = function() {
-    clearInterval(barTimer);
+  function launchApp() {
     const b = document.getElementById('load-bar');
     if (b) b.style.width = '100%';
-    setTimeout(() => {
-      const appScript = document.createElement('script');
-      appScript.src = 'sales.js';
-      document.body.appendChild(appScript);
-    }, 150);
-  };
+    const s = document.createElement('script');
+    s.src = 'sales.js';
+    document.body.appendChild(s);
+  }
 
-  dataScript.onerror = function() {
-    // data_sales.js not found — fall back to full data.js
-    console.warn('data_sales.js not found, falling back to data.js...');
+  function showError(msg) {
     const el = document.querySelector('.load-msg');
-    if (el) el.textContent = 'Loading full data…';
-    const fallback = document.createElement('script');
-    fallback.src = 'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js?v=' + new Date().toISOString().slice(0,10);
-    fallback.onload = function() {
-      clearInterval(barTimer);
-      const b = document.getElementById('load-bar');
-      if (b) b.style.width = '100%';
-      setTimeout(() => {
-        const appScript = document.createElement('script');
-        appScript.src = 'sales.js';
-        document.body.appendChild(appScript);
-      }, 150);
-    };
-    fallback.onerror = function() {
-      clearInterval(barTimer);
-      const el = document.querySelector('.load-msg');
-      if (el) { el.textContent = 'Failed to load data — check connection'; el.style.color = '#F08080'; }
-    };
-    document.head.appendChild(fallback);
-  };
+    if (el) { el.textContent = msg; el.style.color = '#F08080'; }
+    const b = document.getElementById('load-bar');
+    if (b) { b.style.background = '#C8242A'; b.style.width = '100%'; }
+  }
 
-  document.head.appendChild(dataScript);
+  function loadScript(url, onSuccess, onFail) {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = onSuccess;
+    s.onerror = onFail;
+    document.head.appendChild(s);
+  }
+
+  const timer = animateBar();
+
+  // Try slim file first, fall back to full file
+  loadScript(
+    'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js',
+    function() { clearInterval(timer); launchApp(); },
+    function() {
+      const el = document.querySelector('.load-msg');
+      if (el) el.textContent = 'Loading full data…';
+      loadScript(
+        'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data.js',
+        function() { clearInterval(timer); launchApp(); },
+        function() { clearInterval(timer); showError('Failed to load — check connection'); }
+      );
+    }
+  );
 })();
 </script>
 <!-- ── INSTALL BANNER ── -->
