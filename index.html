@@ -277,6 +277,36 @@
   function launchApp() {
     const b = document.getElementById('load-bar');
     if (b) b.style.width = '100%';
+    // Restore the real login screen before loading app
+    document.getElementById('login-screen').innerHTML = `
+      <div class="login-bg"></div>
+      <div class="login-card">
+        <div class="login-logos">
+          <div class="login-logo-block">
+            <svg viewBox="0 0 200 72" class="logo-svg"><defs><linearGradient id="mkuG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mkuG)" letter-spacing="-3">mku</text></svg>
+            <div class="login-logo-sub">PT. Mandala Kriya Utama</div>
+          </div>
+          <div class="login-logo-divider"></div>
+          <div class="login-logo-block">
+            <svg viewBox="0 0 200 72" class="logo-svg"><defs><linearGradient id="mksG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#mksG)" letter-spacing="-3">mks</text></svg>
+            <div class="login-logo-sub">PT. Mandala Kriya Semesta</div>
+          </div>
+        </div>
+        <div class="login-portal-label">Sales Team Portal</div>
+        <div class="login-select-wrap">
+          <div class="login-select-label">Select your name</div>
+          <div class="login-dropdown-wrap">
+            <select class="login-dropdown" id="rep-select" onchange="onRepSelect(this)">
+              <option value="" disabled selected>— Choose —</option>
+            </select>
+            <svg class="login-dropdown-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <button class="login-enter-btn" id="login-enter-btn" onclick="doLogin()" disabled>
+            Continue
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>`;
     const s = document.createElement('script');
     s.src = 'sales.js';
     document.body.appendChild(s);

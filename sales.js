@@ -112,6 +112,7 @@ function getTodaySO(repName) {
 // ════════════════
 function buildLogin() {
   const sel = document.getElementById('rep-select');
+  if (!sel) return; // loading screen is showing, not ready yet
   // Add optgroups
   const fieldReps = REP_CONFIG.filter(r => !r.area.includes('Nestlé'));
   const nestleReps = REP_CONFIG.filter(r => r.area.includes('Nestlé'));
@@ -771,4 +772,6 @@ function renderStock() {
 }
 
 // ── INIT ──
-buildLogin();
+// buildLogin() is called by launchApp() after data loads
+// Only call directly if login screen is already in DOM
+if (document.getElementById('rep-select')) buildLogin();
