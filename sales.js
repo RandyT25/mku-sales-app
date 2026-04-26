@@ -117,13 +117,32 @@ function buildLogin() {
   const fieldReps = REP_CONFIG.filter(r => !r.area.includes('Nestlé'));
   const nestleReps = REP_CONFIG.filter(r => r.area.includes('Nestlé'));
 
+  // Shorten area labels so they fit on one line
+  const SHORT_AREA = {
+    'UBUD':                    'Ubud',
+    'DENPASAR - SANUR':        'Denpasar - Sanur',
+    'KUTA SEL - ULUWATU':      'Kuta Sel - Uluwatu',
+    'KUTA - INDUSTRI / HOTEL': 'Kuta Industri/Hotel',
+    'KUTA SEL - NUSA DUA':     'Nusa Dua',
+    'SEMINYAK':                'Seminyak',
+    'KUTA - LEGIAN':           'Kuta Legian',
+    'CANGGU 1':                'Canggu 1',
+    'CANGGU 2':                'Canggu 2',
+    'GT + FOODY':              'GT + Foody',
+    'MODERN + GT':             'Modern + GT',
+    'NP-1 (Nestlé)':           'NP-1',
+    'NP-2 (Nestlé)':           'NP-2',
+    'NP-3 (Nestlé)':           'NP-3',
+  };
+
   let grp1 = document.createElement('optgroup');
   grp1.label = 'Field Sales';
   fieldReps.forEach(rep => {
     const idx = REP_CONFIG.indexOf(rep);
     const opt = document.createElement('option');
     opt.value = idx;
-    opt.textContent = rep.name + ' — ' + rep.area;
+    const area = SHORT_AREA[rep.area] || rep.area;
+    opt.textContent = rep.name + ' · ' + area;
     grp1.appendChild(opt);
   });
 
@@ -133,7 +152,8 @@ function buildLogin() {
     const idx = REP_CONFIG.indexOf(rep);
     const opt = document.createElement('option');
     opt.value = idx;
-    opt.textContent = rep.name + ' — ' + rep.area;
+    const area = SHORT_AREA[rep.area] || rep.area;
+    opt.textContent = rep.name + ' · ' + area;
     grp2.appendChild(opt);
   });
 
@@ -154,17 +174,25 @@ function doLogin() {
 }
 
 function selectRep(idx) {
-  currentRep = REP_CONFIG[idx];
-  currentRep._color = COLORS[idx % COLORS.length];
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('main-app').classList.remove('hidden');
-  document.getElementById('topbar-name').textContent = currentRep.name;
-  document.getElementById('topbar-area').textContent = currentRep.area;
-  // Format date nicely
-  const d = new Date(RAW.latest);
-  document.getElementById('topbar-date').textContent =
-    d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'2-digit' });
-  renderTarget();
+  try {
+    currentRep = REP_CONFIG[idx];
+    currentRep._color = COLORS[idx % COLORS.length];
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+    document.getElementById('topbar-name').textContent = currentRep.name;
+    document.getElementById('topbar-area').textContent = currentRep.area;
+    const d = new Date(RAW.latest);
+    document.getElementById('topbar-date').textContent =
+      d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'2-digit' });
+    try { renderTarget(); } catch(e) {
+      console.error('renderTarget error:', e);
+      document.getElementById('target-body').innerHTML =
+        '<div style="padding:20px;color:red;font-size:.8rem">Target data error: ' + e.message + '</div>';
+    }
+  } catch(e) {
+    console.error('selectRep error:', e);
+    alert('Login error: ' + e.message);
+  }
 }
 
 function logout() {
@@ -772,6 +800,5 @@ function renderStock() {
 }
 
 // ── INIT ──
-// buildLogin() is called by launchApp() after data loads
-// Only call directly if login screen is already in DOM
-if (document.getElementById('rep-select')) buildLogin();
+// Called by launchApp() in index.html after data loads
+buildLogin();
