@@ -363,7 +363,34 @@ function renderTarget() {
   bodyHtml += `</div></div>`;
 
   // ── GAP CARD ──
-  bodyHtml += `<div class="gap-card">
+  if (multiArea) {
+    // Lani etc: show separate gap cards per area
+    bodyHtml += '<div class="gap-card"><div class="gc-title">How Much More to Go</div>';
+    myMainAreas.forEach(a => {
+      const at = (a.food_target||0) + (a.bev_target||0);
+      const aa = (a.food_ach||0) + (a.bev_ach||0);
+      const g80  = Math.max(0, at * 0.80 - aa);
+      const g100 = Math.max(0, at - aa);
+      const aLabel = a.area.replace('KUTA - ','').replace('KUTA SEL - ','');
+      bodyHtml += '<div class="gc-area-label">' + aLabel + '</div>' +
+        '<div class="gc-grid">' +
+        '<div class="gc-item"><div class="gc-label">To reach 80%</div>' +
+        '<div class="gc-val" style="color:' + (g80===0?'var(--green)':'var(--gold)') + '">' + (g80===0?'✓ Done':fmtShort(g80)) + '</div>' +
+        '<div class="gc-sub">' + (g80===0?'Milestone reached!':'Still needed') + '</div></div>' +
+        '<div class="gc-item"><div class="gc-label">To reach 100%</div>' +
+        '<div class="gc-val" style="color:' + (g100===0?'var(--green)':'var(--red)') + '">' + (g100===0?'✓ Done':fmtShort(g100)) + '</div>' +
+        '<div class="gc-sub">' + (g100===0?'Target achieved!':'Still needed') + '</div></div>' +
+        '<div class="gc-item"><div class="gc-label">Days remaining</div>' +
+        '<div class="gc-val">~' + daysLeft() + '</div>' +
+        '<div class="gc-sub">in ' + RAW.month + '</div></div>' +
+        '<div class="gc-item"><div class="gc-label">Daily run rate</div>' +
+        '<div class="gc-val" style="color:var(--red)">' + (daysLeft()>0?fmtShort(g100/daysLeft()):'—') + '</div>' +
+        '<div class="gc-sub">to hit 100%</div></div>' +
+        '</div>';
+    });
+    bodyHtml += '</div>';
+  } else {
+    bodyHtml += `<div class="gap-card">
     <div class="gc-title">How Much More to Go</div>
     <div class="gc-grid">
       <div class="gc-item">
@@ -388,6 +415,7 @@ function renderTarget() {
       </div>
     </div>
   </div>`;
+  }
 
   // ── AREA LEADERBOARD ──
   // Build ranked list from main areas only (no NN), then inject NN sub-rows under their sales

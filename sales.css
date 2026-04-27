@@ -699,3 +699,12 @@ input { font-family: var(--sans); }
   background: var(--surface2) !important;
 }
 .nn-subrow .ac-name { color: var(--txt2) !important; }
+
+/* ── MULTI-AREA GAP LABEL ── */
+.gc-area-label {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--txt2);
+  padding: 10px 0 6px; border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+.gc-area-label:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
