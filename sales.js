@@ -104,7 +104,13 @@ function getStockItem(productName) {
   return allStock.find(s => s.name && pname.includes(s.name.toLowerCase().substring(0,8)));
 }
 function getTodaySO(repName) {
-  return RAW.so.filter(s => s.date === RAW.latest && s.sales && s.sales.toLowerCase().includes(repName.toLowerCase().split(' ')[0]));
+  // Exact match first, then fuzzy fallback for name variants
+  const exact = RAW.so.filter(s => s.date === RAW.latest && s.sales === repName);
+  if (exact.length > 0) return exact;
+  // Fallback: match on full name parts (not just first word)
+  const parts = repName.toLowerCase().split(' ').filter(w => w.length > 2);
+  return RAW.so.filter(s => s.date === RAW.latest && s.sales &&
+    parts.every(p => s.sales.toLowerCase().includes(p)));
 }
 
 // ════════════════
