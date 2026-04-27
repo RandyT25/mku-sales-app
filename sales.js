@@ -220,60 +220,48 @@ function switchTab(tab) {
 // ════════════════
 // TARGET SCREEN
 // ════════════════
-// ── REP TYPE HELPERS ──
-const NESTLE_REPS  = ['Ridwan','Redi','Gek Mas'];
-const NN_REPS      = { 'I Made Luih': 'NAUGHTY NURIS (SANUR)', 'Sujana': 'NAUGHTY NURIS (SEMINYAK)' };
-
-function isNestleRep(name)  { return NESTLE_REPS.includes(name); }
-function hasNNArea(name)    { return !!NN_REPS[name]; }
-
 function renderTarget() {
   if (!currentRep) return;
   const d = getLatestData();
   const repName = currentRep.name;
 
-  // ── NESTLÉ REPS: show only Nestlé data ──
-  if (isNestleRep(repName)) {
-    renderNestleTarget(d, repName);
-    return;
-  }
-
-  // ── REGULAR REPS: find their areas (exclude Naughty Nuris) ──
-  const myMainAreas = d.area_targets.filter(a =>
-    a.sales === repName && !a.area.includes('NAUGHTY NURIS')
+  // Find this rep's area(s)
+  const myAreas = d.area_targets.filter(a =>
+    a.sales.toLowerCase().includes(repName.toLowerCase().split(' ')[0])
   );
 
-  // Naughty Nuris area for this rep (if any)
-  const myNNArea = d.area_targets.find(a =>
-    a.sales === repName && a.area.includes('NAUGHTY NURIS')
+  // Check if nestle rep
+  const isNestle = d.nestle_areas.find(n =>
+    n.sales.toLowerCase().includes(repName.toLowerCase().split(' ')[0])
   );
 
-  // Aggregate main area totals only
+  // Aggregate totals for this rep
   let food_target = 0, bev_target = 0, food_ach = 0, bev_ach = 0;
-  myMainAreas.forEach(a => {
+  myAreas.forEach(a => {
     food_target += a.food_target || 0;
     bev_target  += a.bev_target  || 0;
     food_ach    += a.food_ach    || 0;
     bev_ach     += a.bev_ach     || 0;
   });
 
-  // If rep also has Naughty Nuris, add it separately as food
-  let nn_target = 0, nn_ach = 0;
-  if (myNNArea) {
-    nn_target = myNNArea.food_target || 0;
-    nn_ach    = myNNArea.food_ach    || 0;
+  let nestle_target = 0, nestle_ach = 0;
+  if (isNestle) {
+    nestle_target = isNestle.target || 0;
+    nestle_ach    = isNestle.achievement || 0;
   }
 
-  const total_target = food_target + bev_target + nn_target;
-  const total_ach    = food_ach + bev_ach + nn_ach;
+  const total_target = food_target + bev_target + nestle_target;
+  const total_ach    = food_ach + bev_ach + nestle_ach;
   const overall_pct  = total_target > 0 ? Math.round((total_ach / total_target) * 100) : 0;
 
+  // Gap to milestones
   const gap80  = Math.max(0, total_target * 0.80 - total_ach);
   const gap100 = Math.max(0, total_target - total_ach);
+
+  // Hero section
   const tagCls = pctTag(overall_pct);
   const tagLabel = overall_pct >= 100 ? '🎉 Target Hit!' : overall_pct >= 80 ? '🔥 Almost there' : overall_pct >= 50 ? '📈 On Track' : '⚡ Push harder';
 
-  // Hero
   document.getElementById('target-hero').innerHTML = `
     <div class="th-month">${RAW.month} · as of ${RAW.latest}</div>
     <div class="th-rep">${repName}</div>
@@ -291,20 +279,27 @@ function renderTarget() {
       ${food_target > 0 ? `<div class="th-mini">
         <div class="th-mini-label">Food</div>
         <div class="th-mini-val">${fmtShort(food_ach)}</div>
-        <div class="th-mini-pct" style="color:${pctColor(Math.round(food_ach/food_target*100))}">${Math.round(food_ach/food_target*100)}%</div>
+        <div class="th-mini-pct" style="color:${pctColor(Math.round(food_ach/food_target*100))}">
+          ${Math.round(food_ach/food_target*100)}%
+        </div>
       </div>` : ''}
       ${bev_target > 0 ? `<div class="th-mini">
         <div class="th-mini-label">Beverage</div>
         <div class="th-mini-val">${fmtShort(bev_ach)}</div>
-        <div class="th-mini-pct" style="color:${pctColor(Math.round(bev_ach/bev_target*100))}">${Math.round(bev_ach/bev_target*100)}%</div>
+        <div class="th-mini-pct" style="color:${pctColor(Math.round(bev_ach/bev_target*100))}">
+          ${Math.round(bev_ach/bev_target*100)}%
+        </div>
       </div>` : ''}
-      ${nn_target > 0 ? `<div class="th-mini">
-        <div class="th-mini-label">Naughty Nuris</div>
-        <div class="th-mini-val">${fmtShort(nn_ach)}</div>
-        <div class="th-mini-pct" style="color:${pctColor(Math.round(nn_ach/nn_target*100))}">${Math.round(nn_ach/nn_target*100)}%</div>
+      ${nestle_target > 0 ? `<div class="th-mini">
+        <div class="th-mini-label">Nestlé</div>
+        <div class="th-mini-val">${fmtShort(nestle_ach)}</div>
+        <div class="th-mini-pct" style="color:${pctColor(Math.round(nestle_ach/nestle_target*100))}">
+          ${Math.round(nestle_ach/nestle_target*100)}%
+        </div>
       </div>` : ''}
     </div>`;
 
+  // Body
   let bodyHtml = '';
 
   // ── MILESTONE CARD ──
@@ -313,12 +308,13 @@ function renderTarget() {
     <div class="mc-bars">`;
 
   const bars = [];
-  if (food_target > 0)  bars.push({ label:'Food',          ach:food_ach, tgt:food_target, color:'#C8242A' });
-  if (bev_target > 0)   bars.push({ label:'Beverage',       ach:bev_ach,  tgt:bev_target,  color:'#163C70' });
-  if (nn_target > 0)    bars.push({ label:'Naughty Nuris',  ach:nn_ach,   tgt:nn_target,   color:'#B07D1A' });
+  if (food_target > 0)    bars.push({ label:'Food',    ach:food_ach,    tgt:food_target,    color:'#C8242A' });
+  if (bev_target > 0)     bars.push({ label:'Beverage', ach:bev_ach,    tgt:bev_target,     color:'#163C70' });
+  if (nestle_target > 0)  bars.push({ label:'Nestlé',   ach:nestle_ach, tgt:nestle_target,  color:'#B07D1A' });
 
   bars.forEach(b => {
     const pct = b.tgt > 0 ? Math.min(100, (b.ach / b.tgt * 100)) : 0;
+    const pct80 = 80;
     bodyHtml += `<div class="mc-bar-row">
       <div class="mc-bar-top">
         <div class="mc-bar-label">${b.label}</div>
@@ -328,8 +324,14 @@ function renderTarget() {
         <div class="mc-bar-fill" style="width:${pct}%;background:${b.color}"></div>
       </div>
       <div class="mc-markers">
-        <div class="mc-mark" style="left:80%"><div class="mc-mark-line"></div><div class="mc-mark-label">80%</div></div>
-        <div class="mc-mark" style="left:99%"><div class="mc-mark-line"></div><div class="mc-mark-label">100%</div></div>
+        <div class="mc-mark" style="left:${pct80}%">
+          <div class="mc-mark-line"></div>
+          <div class="mc-mark-label">80%</div>
+        </div>
+        <div class="mc-mark" style="left:99%">
+          <div class="mc-mark-line"></div>
+          <div class="mc-mark-label">100%</div>
+        </div>
       </div>
     </div>`;
   });
@@ -341,12 +343,12 @@ function renderTarget() {
     <div class="gc-grid">
       <div class="gc-item">
         <div class="gc-label">To reach 80%</div>
-        <div class="gc-val" style="color:${gap80===0?'var(--green)':'var(--gold)'}">${gap80===0?'✓ Done':fmtShort(gap80)}</div>
+        <div class="gc-val" style="color:${gap80===0?'var(--green)':'var(--gold)'}">${gap80 === 0 ? '✓ Done' : fmtShort(gap80)}</div>
         <div class="gc-sub">${gap80===0?'Milestone reached!':'Still needed'}</div>
       </div>
       <div class="gc-item">
         <div class="gc-label">To reach 100%</div>
-        <div class="gc-val" style="color:${gap100===0?'var(--green)':'var(--red)'}">${gap100===0?'✓ Done':fmtShort(gap100)}</div>
+        <div class="gc-val" style="color:${gap100===0?'var(--green)':'var(--red)'}">${gap100 === 0 ? '✓ Done' : fmtShort(gap100)}</div>
         <div class="gc-sub">${gap100===0?'Target achieved!':'Still needed'}</div>
       </div>
       <div class="gc-item">
@@ -355,29 +357,30 @@ function renderTarget() {
         <div class="gc-sub">in ${RAW.month}</div>
       </div>
       <div class="gc-item">
-        <div class="gc-label">Daily run rate</div>
-        <div class="gc-val" style="color:var(--red)">${daysLeft()>0?fmtShort(gap100/daysLeft()):'—'}</div>
+        <div class="gc-label">Daily run rate needed</div>
+        <div class="gc-val" style="color:var(--red)">${daysLeft()>0 ? fmtShort(gap100/daysLeft()) : '—'}</div>
         <div class="gc-sub">to hit 100%</div>
       </div>
     </div>
   </div>`;
 
-  // ── AREA LEADERBOARD (exclude Naughty Nuris rows, no 👈 on duplicates) ──
-  const mainAreas = d.area_targets.filter(a => !a.area.includes('NAUGHTY NURIS'));
-  const sortedAreas = [...mainAreas].sort((a,b) => b.pct - a.pct);
-  const myAreaNames = myMainAreas.map(a => a.area);
-
+  // ── AREA LEADERBOARD ──
+  const sortedAreas = [...d.area_targets].sort((a,b) => b.pct - a.pct);
   bodyHtml += `<div class="area-card">
     <div class="ac-title">Area Leaderboard · ${RAW.month}</div>
     ${sortedAreas.map((a, i) => {
-      const isMe = myAreaNames.includes(a.area);
-      return `<div class="ac-row" style="${isMe?'background:var(--red-l);border-radius:8px;padding:8px 6px;margin:-2px -4px;':''}">
-        <div class="ac-rank" style="${i<3?'color:var(--gold);font-weight:700':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}</div>
+      const isMe = myAreas.some(ma => ma.area === a.area);
+      return `<div class="ac-row" style="${isMe ? 'background:var(--red-l);border-radius:8px;padding:8px 6px;margin:-2px -4px;' : ''}">
+        <div class="ac-rank" style="${i<3?'color:var(--gold);font-weight:700':''}">
+          ${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}
+        </div>
         <div>
           <div class="ac-name">${a.sales}${isMe?' 👈':''}</div>
           <div class="ac-area">${a.area}</div>
         </div>
-        <div class="ac-bar-wrap"><div class="ac-bar" style="width:${Math.min(a.pct,100)}%;background:${pctColor(a.pct)}"></div></div>
+        <div class="ac-bar-wrap">
+          <div class="ac-bar" style="width:${Math.min(a.pct,100)}%;background:${pctColor(a.pct)}"></div>
+        </div>
         <div class="ac-pct" style="color:${pctColor(a.pct)}">${a.pct}%</div>
       </div>`;
     }).join('')}
@@ -386,134 +389,7 @@ function renderTarget() {
   // ── TODAY'S ORDERS ──
   const todaySO = getTodaySO(repName);
   if (todaySO.length > 0) {
-    const todayRev = todaySO.reduce((s,o) => s+(o.revenue||0), 0);
-    bodyHtml += `<div class="today-card">
-      <div class="tc-title">Today's Orders · ${fmtShort(todayRev)} (${todaySO.length} SO)</div>
-      <div class="tc-so">
-        ${todaySO.map(o => `<div class="tc-so-row">
-          <div class="tc-so-left">
-            <div class="tc-so-cust">${o.customer}</div>
-            <div class="tc-so-prod">${o.product}</div>
-          </div>
-          <div class="tc-so-rev">${fmtShort(o.revenue)}</div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-  }
-
-  document.getElementById('target-body').innerHTML = bodyHtml;
-}
-
-// ── NESTLÉ REP TARGET VIEW ──
-function renderNestleTarget(d, repName) {
-  const myNestle = d.nestle_areas.find(n => n.sales === repName);
-  if (!myNestle) { document.getElementById('target-hero').innerHTML = '<div style="padding:20px;color:white">No Nestlé data found</div>'; return; }
-
-  const pct = myNestle.pct || 0;
-  const ach = myNestle.achievement || 0;
-  const tgt = myNestle.target || 0;
-  const gap80  = Math.max(0, tgt * 0.80 - ach);
-  const gap100 = Math.max(0, tgt - ach);
-  const tagCls = pctTag(pct);
-  const tagLabel = pct >= 100 ? '🎉 Target Hit!' : pct >= 80 ? '🔥 Almost there' : pct >= 50 ? '📈 On Track' : '⚡ Push harder';
-
-  document.getElementById('target-hero').innerHTML = `
-    <div class="th-month">${RAW.month} · as of ${RAW.latest}</div>
-    <div class="th-rep">${repName}</div>
-    <div class="th-overall">
-      <div>
-        <div class="th-pct" style="color:${pctColor(pct)}">${pct}%</div>
-        <div class="th-pct-label">Nestlé Target</div>
-      </div>
-      <div>
-        <div class="th-status-tag ${tagCls}">${tagLabel}</div>
-        <div style="color:rgba(255,255,255,0.35);font-size:.68rem;margin-top:6px">${fmtShort(ach)} of ${fmtShort(tgt)}</div>
-      </div>
-    </div>
-    <div class="th-mini-grid">
-      <div class="th-mini">
-        <div class="th-mini-label">Achievement</div>
-        <div class="th-mini-val">${fmtShort(ach)}</div>
-        <div class="th-mini-pct" style="color:${pctColor(pct)}">${pct}%</div>
-      </div>
-      <div class="th-mini">
-        <div class="th-mini-label">Target</div>
-        <div class="th-mini-val">${fmtShort(tgt)}</div>
-        <div class="th-mini-pct" style="color:rgba(255,255,255,0.4)">100%</div>
-      </div>
-    </div>`;
-
-  let bodyHtml = '';
-
-  // Progress bar
-  bodyHtml += `<div class="milestone-card">
-    <div class="mc-title">Nestlé Progress</div>
-    <div class="mc-bars">
-      <div class="mc-bar-row">
-        <div class="mc-bar-top">
-          <div class="mc-bar-label">Nestlé</div>
-          <div class="mc-bar-nums">${fmtShort(ach)} / ${fmtShort(tgt)}</div>
-        </div>
-        <div class="mc-bar-bg">
-          <div class="mc-bar-fill" style="width:${Math.min(pct,100)}%;background:#B07D1A"></div>
-        </div>
-        <div class="mc-markers">
-          <div class="mc-mark" style="left:80%"><div class="mc-mark-line"></div><div class="mc-mark-label">80%</div></div>
-          <div class="mc-mark" style="left:99%"><div class="mc-mark-line"></div><div class="mc-mark-label">100%</div></div>
-        </div>
-      </div>
-    </div>
-  </div>`;
-
-  // Gap card
-  bodyHtml += `<div class="gap-card">
-    <div class="gc-title">How Much More to Go</div>
-    <div class="gc-grid">
-      <div class="gc-item">
-        <div class="gc-label">To reach 80%</div>
-        <div class="gc-val" style="color:${gap80===0?'var(--green)':'var(--gold)'}">${gap80===0?'✓ Done':fmtShort(gap80)}</div>
-        <div class="gc-sub">${gap80===0?'Milestone reached!':'Still needed'}</div>
-      </div>
-      <div class="gc-item">
-        <div class="gc-label">To reach 100%</div>
-        <div class="gc-val" style="color:${gap100===0?'var(--green)':'var(--red)'}">${gap100===0?'✓ Done':fmtShort(gap100)}</div>
-        <div class="gc-sub">${gap100===0?'Target achieved!':'Still needed'}</div>
-      </div>
-      <div class="gc-item">
-        <div class="gc-label">Days remaining</div>
-        <div class="gc-val">~${daysLeft()}</div>
-        <div class="gc-sub">in ${RAW.month}</div>
-      </div>
-      <div class="gc-item">
-        <div class="gc-label">Daily run rate</div>
-        <div class="gc-val" style="color:var(--red)">${daysLeft()>0?fmtShort(gap100/daysLeft()):'—'}</div>
-        <div class="gc-sub">to hit 100%</div>
-      </div>
-    </div>
-  </div>`;
-
-  // Nestlé Leaderboard
-  const sortedNestle = [...d.nestle_areas].sort((a,b) => b.pct - a.pct);
-  bodyHtml += `<div class="area-card">
-    <div class="ac-title">Nestlé Leaderboard · ${RAW.month}</div>
-    ${sortedNestle.map((n,i) => {
-      const isMe = n.sales === repName;
-      return `<div class="ac-row" style="${isMe?'background:var(--red-l);border-radius:8px;padding:8px 6px;margin:-2px -4px;':''}">
-        <div class="ac-rank" style="${i<3?'color:var(--gold);font-weight:700':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}</div>
-        <div>
-          <div class="ac-name">${n.sales}${isMe?' 👈':''}</div>
-          <div class="ac-area">${n.area}</div>
-        </div>
-        <div class="ac-bar-wrap"><div class="ac-bar" style="width:${Math.min(n.pct,100)}%;background:${pctColor(n.pct)}"></div></div>
-        <div class="ac-pct" style="color:${pctColor(n.pct)}">${n.pct}%</div>
-      </div>`;
-    }).join('')}
-  </div>`;
-
-  // Today's orders
-  const todaySO = getTodaySO(repName);
-  if (todaySO.length > 0) {
-    const todayRev = todaySO.reduce((s,o) => s+(o.revenue||0), 0);
+    const todayRev = todaySO.reduce((s, o) => s + (o.revenue || 0), 0);
     bodyHtml += `<div class="today-card">
       <div class="tc-title">Today's Orders · ${fmtShort(todayRev)} (${todaySO.length} SO)</div>
       <div class="tc-so">
@@ -549,31 +425,16 @@ function switchDiv(div, btn) {
 }
 
 function renderPricelist() {
-  // Nestlé reps: auto-switch to MKS + Nestlé category
-  if (currentRep && isNestleRep(currentRep.name)) {
-    plDiv = 'MKS';
-    plCat = 'Nestle';
-    // Update tab UI
-    document.querySelectorAll('.pl-divtab').forEach(b => b.classList.remove('active'));
-    const mksTab = document.querySelectorAll('.pl-divtab')[1];
-    if (mksTab) mksTab.classList.add('active');
-  }
-  const nestleOnly = currentRep && isNestleRep(currentRep.name);
-  const mkuN = nestleOnly ? 0 : PRODUCTS.filter(p => p.division === 'MKU').length;
-  const mksN = nestleOnly ? PRODUCTS.filter(p => p.division === 'MKS' && p.category === 'Nestle').length
-                           : PRODUCTS.filter(p => p.division === 'MKS').length;
-  document.getElementById('mku-count').textContent = mkuN || '';
+  const mkuN = PRODUCTS.filter(p => p.division === 'MKU').length;
+  const mksN = PRODUCTS.filter(p => p.division === 'MKS').length;
+  document.getElementById('mku-count').textContent = mkuN;
   document.getElementById('mks-count').textContent = mksN;
   renderCats(); renderList();
 }
 
 function getFiltered() {
-  // Nestlé reps only see Nestlé products
-  const nestleOnly = currentRep && isNestleRep(currentRep.name);
-
   return PRODUCTS.filter(p => {
     if (p.division !== plDiv) return false;
-    if (nestleOnly && p.category !== 'Nestle') return false;
     if (plCat !== 'ALL' && p.category !== plCat) return false;
     if (plSearch) {
       const q = plSearch.toLowerCase();
