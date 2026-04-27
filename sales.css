@@ -636,8 +636,8 @@ input { font-family: var(--sans); }
 
 /* ── COMBINED LOGO ── */
 .login-combined-logo {
-  width: 180px;
-  max-width: 75%;
+  width: 240px;
+  max-width: 85%;
   height: auto;
   object-fit: contain;
   display: block;
@@ -690,3 +690,12 @@ input { font-family: var(--sans); }
   .bnav { font-size: .6rem; }
   .bnav svg { width: 20px; height: 20px; }
 }
+
+/* ── NAUGHTY NURIS SUB-ROW ── */
+.nn-subrow {
+  padding-left: 12px !important;
+  border-left: 2px solid var(--border);
+  margin-left: 8px !important;
+  background: var(--surface2) !important;
+}
+.nn-subrow .ac-name { color: var(--txt2) !important; }
