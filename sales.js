@@ -226,6 +226,53 @@ function switchTab(tab) {
 // ════════════════
 // TARGET SCREEN
 // ════════════════
+// ── BADGE SYSTEM ──
+function getBadges(repName, d) {
+  const badges = [];
+
+  // Get all areas for this rep (main only, no NN)
+  const myAreas = d.area_targets.filter(a =>
+    a.sales === repName && !a.area.includes('NAUGHTY NURIS')
+  );
+
+  // Nestlé rep — check nestle_areas
+  const nestleEntry = d.nestle_areas.find(n => n.sales === repName);
+
+  // Calculate overall pct
+  let total_t = 0, total_a = 0;
+  myAreas.forEach(a => {
+    total_t += (a.food_target||0) + (a.bev_target||0);
+    total_a += (a.food_ach||0) + (a.bev_ach||0);
+  });
+  if (nestleEntry) {
+    total_t += nestleEntry.target || 0;
+    total_a += nestleEntry.achievement || 0;
+  }
+  const pct = total_t > 0 ? Math.round(total_a / total_t * 100) : 0;
+
+  // 🎯 On Target — 80%+
+  if (pct >= 80) badges.push({ icon: '🎯', name: 'On Target', desc: 'Reached 80% of target' });
+
+  // 🏆 Full Target — 100%+
+  if (pct >= 100) badges.push({ icon: '🏆', name: 'Full Target', desc: 'Hit 100% of target!' });
+
+  // 💎 Overachiever — 110%+
+  if (pct >= 110) badges.push({ icon: '💎', name: 'Overachiever', desc: 'Exceeded 110% — outstanding!' });
+
+  // 👑 Area King — #1 in leaderboard
+  const mainAreas = d.area_targets.filter(a => !a.area.includes('NAUGHTY NURIS'));
+  const sorted = [...mainAreas].sort((a,b) => b.pct - a.pct);
+  if (sorted.length > 0 && sorted[0].sales === repName) {
+    badges.push({ icon: '👑', name: 'Area King', desc: 'Top of the leaderboard this month!' });
+  }
+
+  return badges;
+}
+
+function getBadgeIcons(repName, d) {
+  return getBadges(repName, d).map(b => b.icon).join('');
+}
+
 // ── REP TYPE HELPERS ──
 const NESTLE_REPS  = ['Ridwan','Redi','Gek Mas'];
 const NN_REPS      = { 'I Made Luih': 'NAUGHTY NURIS (SANUR)', 'Sujana': 'NAUGHTY NURIS (SEMINYAK)' };
@@ -270,32 +317,86 @@ function renderTarget() {
     nn_ach    = myNNArea.food_ach    || 0;
   }
 
-  const total_target = food_target + bev_target + nn_target;
-  const total_ach    = food_ach + bev_ach + nn_ach;
-  const overall_pct  = total_target > 0 ? Math.round((total_ach / total_target) * 100) : 0;
+  // ── TOTALS & PCT ──
+  // Main area totals (no NN)
+  const main_target = food_target + bev_target;
+  const main_ach    = food_ach + bev_ach;
+  const main_pct    = main_target > 0 ? Math.round(main_ach / main_target * 100) : 0;
+
+  // NN totals separate
+  const nn_pct = nn_target > 0 ? Math.round(nn_ach / nn_target * 100) : 0;
+
+  // Overall (main + NN combined) for gap card
+  const total_target = main_target + nn_target;
+  const total_ach    = main_ach + nn_ach;
+  const overall_pct  = total_target > 0 ? Math.round(total_ach / total_target * 100) : 0;
 
   const gap80  = Math.max(0, total_target * 0.80 - total_ach);
   const gap100 = Math.max(0, total_target - total_ach);
-  const tagCls = pctTag(overall_pct);
-  const tagLabel = overall_pct >= 100 ? '🎉 Target Hit!' : overall_pct >= 80 ? '🔥 Almost there' : overall_pct >= 50 ? '📈 On Track' : '⚡ Push harder';
-
-  // Build mini cards
   const multiArea = myMainAreas.length > 1;
-  let miniCardsHtml = '';
 
+  // ── HERO PCT DISPLAY ──
+  // For Lani (multi-area): show 2 area percentages side by side
+  // For Made/Sujana (NN): show Overall % + NN % side by side
+  // For regular reps: show single overall %
+
+  let heroOverallHtml = '';
   if (multiArea) {
-    // Multiple areas (e.g. Lani): show each area separately
-    myMainAreas.forEach(a => {
+    // Lani: show each area pct separately
+    heroOverallHtml = myMainAreas.map(a => {
       const at = (a.food_target||0) + (a.bev_target||0);
-      const aa = (a.food_ach||0)   + (a.bev_ach||0);
-      const ap = at > 0 ? Math.round(aa / at * 100) : 0;
-      // Shorten area label
+      const aa = (a.food_ach||0) + (a.bev_ach||0);
+      const ap = at > 0 ? Math.round(aa/at*100) : 0;
       const aLabel = a.area.replace('KUTA - ','').replace('KUTA SEL - ','');
-      miniCardsHtml += '<div class="th-mini">' +
-        '<div class="th-mini-label" style="font-size:.55rem">' + aLabel + '</div>' +
-        '<div class="th-mini-val">' + fmtShort(aa) + '</div>' +
-        '<div class="th-mini-pct" style="color:' + pctColor(ap) + '">' + ap + '%</div>' +
+      const tagL = ap >= 100 ? '🎉 Hit!' : ap >= 80 ? '🔥 Almost' : ap >= 50 ? '📈 On Track' : '⚡ Push';
+      return '<div style="text-align:center">' +
+        '<div class="th-pct" style="color:' + pctColor(ap) + '">' + ap + '%</div>' +
+        '<div class="th-pct-label">' + aLabel + '</div>' +
+        '<div class="th-status-tag ' + pctTag(ap) + '" style="margin-top:4px">' + tagL + '</div>' +
         '</div>';
+    }).join('<div style="width:1px;background:rgba(255,255,255,0.1);margin:0 8px;align-self:stretch"></div>');
+  } else if (nn_target > 0) {
+    // Made / Sujana: Overall + NN separately
+    const tagMain = main_pct >= 100 ? '🎉 Hit!' : main_pct >= 80 ? '🔥 Almost' : main_pct >= 50 ? '📈 On Track' : '⚡ Push';
+    const tagNN   = nn_pct   >= 100 ? '🎉 Hit!' : nn_pct   >= 80 ? '🔥 Almost' : nn_pct   >= 50 ? '📈 On Track' : '⚡ Push';
+    heroOverallHtml =
+      '<div style="text-align:center">' +
+        '<div class="th-pct" style="color:' + pctColor(main_pct) + '">' + main_pct + '%</div>' +
+        '<div class="th-pct-label">Overall</div>' +
+        '<div class="th-status-tag ' + pctTag(main_pct) + '" style="margin-top:4px">' + tagMain + '</div>' +
+      '</div>' +
+      '<div style="width:1px;background:rgba(255,255,255,0.1);margin:0 8px;align-self:stretch"></div>' +
+      '<div style="text-align:center">' +
+        '<div class="th-pct" style="color:' + pctColor(nn_pct) + ';font-size:1.8rem">' + nn_pct + '%</div>' +
+        '<div class="th-pct-label">N. Nuris</div>' +
+        '<div class="th-status-tag ' + pctTag(nn_pct) + '" style="margin-top:4px">' + tagNN + '</div>' +
+      '</div>';
+  } else {
+    // Regular rep: single pct
+    const tagLabel = overall_pct >= 100 ? '🎉 Target Hit!' : overall_pct >= 80 ? '🔥 Almost there' : overall_pct >= 50 ? '📈 On Track' : '⚡ Push harder';
+    heroOverallHtml =
+      '<div><div class="th-pct" style="color:' + pctColor(overall_pct) + '">' + overall_pct + '%</div>' +
+      '<div class="th-pct-label">Overall</div></div>' +
+      '<div><div class="th-status-tag ' + pctTag(overall_pct) + '">' + tagLabel + '</div>' +
+      '<div style="color:rgba(255,255,255,0.35);font-size:.68rem;margin-top:6px">' + fmtShort(total_ach) + ' of ' + fmtShort(total_target) + '</div></div>';
+  }
+
+  // ── MINI CARDS ──
+  let miniCardsHtml = '';
+  if (multiArea) {
+    // Lani: each area split into Food + Beverage
+    myMainAreas.forEach(a => {
+      const aLabel = a.area.replace('KUTA - ','').replace('KUTA SEL - ','');
+      if (a.food_target > 0) miniCardsHtml +=
+        '<div class="th-mini">' +
+        '<div class="th-mini-label" style="font-size:.52rem">' + aLabel + ' · Food</div>' +
+        '<div class="th-mini-val">' + fmtShort(a.food_ach) + '</div>' +
+        '<div class="th-mini-pct" style="color:' + pctColor(Math.round(a.food_ach/a.food_target*100)) + '">' + Math.round(a.food_ach/a.food_target*100) + '%</div></div>';
+      if (a.bev_target > 0) miniCardsHtml +=
+        '<div class="th-mini">' +
+        '<div class="th-mini-label" style="font-size:.52rem">' + aLabel + ' · Bev</div>' +
+        '<div class="th-mini-val">' + fmtShort(a.bev_ach) + '</div>' +
+        '<div class="th-mini-pct" style="color:' + pctColor(Math.round(a.bev_ach/a.bev_target*100)) + '">' + Math.round(a.bev_ach/a.bev_target*100) + '%</div></div>';
     });
   } else {
     if (food_target > 0) miniCardsHtml +=
@@ -306,28 +407,21 @@ function renderTarget() {
       '<div class="th-mini"><div class="th-mini-label">Beverage</div>' +
       '<div class="th-mini-val">' + fmtShort(bev_ach) + '</div>' +
       '<div class="th-mini-pct" style="color:' + pctColor(Math.round(bev_ach/bev_target*100)) + '">' + Math.round(bev_ach/bev_target*100) + '%</div></div>';
+    if (nn_target > 0) miniCardsHtml +=
+      '<div class="th-mini"><div class="th-mini-label">N. Nuris</div>' +
+      '<div class="th-mini-val">' + fmtShort(nn_ach) + '</div>' +
+      '<div class="th-mini-pct" style="color:' + pctColor(nn_pct) + '">' + nn_pct + '%</div></div>';
   }
-  // Always show NN mini card if rep has Naughty Nuris
-  if (nn_target > 0) miniCardsHtml +=
-    '<div class="th-mini"><div class="th-mini-label">N. Nuris</div>' +
-    '<div class="th-mini-val">' + fmtShort(nn_ach) + '</div>' +
-    '<div class="th-mini-pct" style="color:' + pctColor(Math.round(nn_ach/nn_target*100)) + '">' + Math.round(nn_ach/nn_target*100) + '%</div></div>';
 
   // Hero
-  document.getElementById('target-hero').innerHTML = `
-    <div class="th-month">${RAW.month} · as of ${RAW.latest}</div>
-    <div class="th-rep">${repName}</div>
-    <div class="th-overall">
-      <div>
-        <div class="th-pct" style="color:${pctColor(overall_pct)}">${overall_pct}%</div>
-        <div class="th-pct-label">Overall</div>
-      </div>
-      <div>
-        <div class="th-status-tag ${tagCls}">${tagLabel}</div>
-        <div style="color:rgba(255,255,255,0.35);font-size:.68rem;margin-top:6px">${fmtShort(total_ach)} of ${fmtShort(total_target)}</div>
-      </div>
-    </div>
-    <div class="th-mini-grid">${miniCardsHtml}</div>`;
+  document.getElementById('target-hero').innerHTML =
+    '<div class="th-month">' + RAW.month + ' · as of ' + RAW.latest + '</div>' +
+    '<div class="th-rep">' + repName + '</div>' +
+    '<div class="th-overall" style="display:flex;align-items:center;gap:4px">' + heroOverallHtml + '</div>' +
+    (!multiArea && !nn_target ? '' :
+      '<div style="color:rgba(255,255,255,0.35);font-size:.65rem;text-align:center;margin-top:4px">' +
+      fmtShort(total_ach) + ' of ' + fmtShort(total_target) + ' total</div>') +
+    '<div class="th-mini-grid">' + miniCardsHtml + '</div>';
 
   let bodyHtml = '';
 
@@ -450,10 +544,11 @@ function renderTarget() {
     const rankDisp = rank <= 3 ? (rank===1?'🥇':rank===2?'🥈':'🥉') : rank;
     const meStyle = isMe ? 'background:var(--red-l);border-radius:8px;padding:8px 6px;margin:-2px -4px;' : '';
 
+    const rowBadges = getBadgeIcons(a.sales, d);
     lbHtml += `<div class="ac-row" style="${meStyle}">
       <div class="ac-rank" style="${rank<=3?'color:var(--gold);font-weight:700':''}">${rankDisp}</div>
-      <div>
-        <div class="ac-name">${a.sales}${isMe?' 👈':''}</div>
+      <div style="flex:1;min-width:0">
+        <div class="ac-name">${a.sales}${isMe?' 👈':''}${rowBadges ? ' <span class="ac-badges">'+rowBadges+'</span>' : ''}</div>
         <div class="ac-area">${a.area}</div>
       </div>
       <div class="ac-bar-wrap"><div class="ac-bar" style="width:${Math.min(a.pct,100)}%;background:${pctColor(a.pct)}"></div></div>
@@ -476,6 +571,22 @@ function renderTarget() {
       </div>`;
     }
   });
+
+  // ── MY BADGES ──
+  const myBadges = getBadges(repName, d);
+  if (myBadges.length > 0) {
+    bodyHtml += '<div class="badges-card">' +
+      '<div class="gc-title">Your Badges This Month</div>' +
+      '<div class="badges-grid">' +
+      myBadges.map(b =>
+        '<div class="badge-item">' +
+          '<div class="badge-icon">' + b.icon + '</div>' +
+          '<div class="badge-name">' + b.name + '</div>' +
+          '<div class="badge-desc">' + b.desc + '</div>' +
+        '</div>'
+      ).join('') +
+      '</div></div>';
+  }
 
   bodyHtml += `<div class="area-card">
     <div class="ac-title">Area Leaderboard · ${RAW.month}</div>
@@ -597,10 +708,11 @@ function renderNestleTarget(d, repName) {
     <div class="ac-title">Nestlé Leaderboard · ${RAW.month}</div>
     ${sortedNestle.map((n,i) => {
       const isMe = n.sales === repName;
+      const nb = getBadgeIcons(n.sales, d);
       return `<div class="ac-row" style="${isMe?'background:var(--red-l);border-radius:8px;padding:8px 6px;margin:-2px -4px;':''}">
         <div class="ac-rank" style="${i<3?'color:var(--gold);font-weight:700':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)}</div>
-        <div>
-          <div class="ac-name">${n.sales}${isMe?' 👈':''}</div>
+        <div style="flex:1;min-width:0">
+          <div class="ac-name">${n.sales}${isMe?' 👈':''}${nb?' <span class="ac-badges">'+nb+'</span>':''}</div>
           <div class="ac-area">${n.area}</div>
         </div>
         <div class="ac-bar-wrap"><div class="ac-bar" style="width:${Math.min(n.pct,100)}%;background:${pctColor(n.pct)}"></div></div>
@@ -1046,6 +1158,206 @@ function renderStock() {
     </div>`;
   });
   document.getElementById('stock-list').innerHTML = h;
+}
+
+// ════════════════
+// TOOLKIT
+// ════════════════
+let activeToolkitSection = 'catalogs';
+
+function switchToolkit(section, btn) {
+  activeToolkitSection = section;
+  document.querySelectorAll('.tk-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.toolkit-section').forEach(s => s.classList.add('hidden'));
+  if (btn) btn.classList.add('active');
+  const sec = document.getElementById('tksec-' + section);
+  if (sec) sec.classList.remove('hidden');
+
+  if (section === 'spotlight') renderSpotlight();
+  if (section === 'faq')       renderFAQ('');
+  if (section === 'battle')    renderBattleCards();
+}
+
+function renderSpotlight() {
+  const el = document.getElementById('spotlight-list');
+  if (!el || typeof TOOLKIT === 'undefined') return;
+
+  const items = TOOLKIT.spotlight || [];
+  if (!items.length) {
+    el.innerHTML = '<div class="tk-empty">No spotlight items yet</div>';
+    return;
+  }
+
+  el.innerHTML = items.map(item => {
+    const focusBadge = item.focus
+      ? '<span class="tk-focus-badge">This Months Focus</span>'
+      : '';
+    return `<div class="tk-card spotlight-card">
+      ${focusBadge}
+      <div class="tk-card-category">${item.category}</div>
+      <div class="tk-card-title">${item.product}</div>
+      <div class="tk-card-tagline">${item.tagline}</div>
+      <div class="tk-section-lbl">The Pitch</div>
+      <div class="tk-card-body">${item.pitch}</div>
+      <div class="tk-section-lbl">Target Customer</div>
+      <div class="tk-card-body">${item.target}</div>
+      <div class="tk-tip-box">
+        <div class="tk-tip-ico">💡</div>
+        <div class="tk-tip-txt">${item.tip}</div>
+      </div>
+      <button class="tk-share-btn" onclick="shareSpotlight(${item.id})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share with Customer
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function shareSpotlight(id) {
+  if (typeof TOOLKIT === 'undefined') return;
+  const item = TOOLKIT.spotlight.find(s => s.id === id);
+  if (!item) return;
+  const lines = [
+    '*' + item.product + '*',
+    item.tagline,
+    '',
+    item.pitch,
+    '',
+    'Target: ' + item.target,
+    '',
+    'Order: +62 822-3661-7866 | order@ptmku.com'
+  ];
+  window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+}
+
+function renderFAQ(query) {
+  const el = document.getElementById('faq-list');
+  if (!el || typeof TOOLKIT === 'undefined') return;
+
+  let items = TOOLKIT.faq || [];
+  if (query) {
+    const q = query.toLowerCase();
+    items = items.filter(f =>
+      f.question.toLowerCase().includes(q) ||
+      f.answer.toLowerCase().includes(q)
+    );
+  }
+
+  if (!items.length) {
+    el.innerHTML = '<div class="tk-empty">No results found</div>';
+    return;
+  }
+
+  el.innerHTML = items.map(f => `
+    <div class="tk-faq-card" onclick="this.classList.toggle('open')">
+      <div class="tk-faq-q">
+        <span>${f.question}</span>
+        <svg class="tk-faq-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="tk-faq-a">${f.answer}</div>
+    </div>`).join('');
+}
+
+function filterFAQ(val) { renderFAQ(val); }
+
+function renderBattleCards() {
+  const el = document.getElementById('battle-list');
+  if (!el || typeof TOOLKIT === 'undefined') return;
+
+  const items = TOOLKIT.battlecards || [];
+  if (!items.length) {
+    el.innerHTML = '<div class="tk-empty">No battle cards yet</div>';
+    return;
+  }
+
+  el.innerHTML = items.map(b => `
+    <div class="tk-card battle-card">
+      <div class="tk-battle-situation">
+        <span class="tk-battle-label">Situation</span>
+        ${b.situation}
+      </div>
+      <div class="tk-section-lbl">Your Response</div>
+      <div class="tk-card-body">${b.response}</div>
+      <div class="tk-section-lbl">Key Points</div>
+      <ul class="tk-battle-points">
+        ${b.keypoints.map(p => '<li>' + p + '</li>').join('')}
+      </ul>
+    </div>`).join('');
+}
+
+// ════════════════
+// ANNOUNCEMENTS
+// ════════════════
+const ANN_KEY = 'mku_ann_read';
+
+function getReadIds() {
+  try { return JSON.parse(localStorage.getItem(ANN_KEY) || '[]'); } catch { return []; }
+}
+
+function markAllRead() {
+  if (typeof ANNOUNCEMENTS === 'undefined') return;
+  const ids = ANNOUNCEMENTS.map(a => a.id);
+  localStorage.setItem(ANN_KEY, JSON.stringify(ids));
+  updateBellBadge();
+}
+
+function updateBellBadge() {
+  if (typeof ANNOUNCEMENTS === 'undefined') return;
+  const read = getReadIds();
+  const unread = ANNOUNCEMENTS.filter(a => !read.includes(a.id)).length;
+  const badge = document.getElementById('bell-badge');
+  if (!badge) return;
+  badge.textContent = unread;
+  badge.classList.toggle('hidden', unread === 0);
+}
+
+function toggleAnnouncements() {
+  const overlay = document.getElementById('ann-overlay');
+  if (!overlay) return;
+  if (overlay.classList.contains('hidden')) {
+    renderAnnouncements();
+    overlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    markAllRead();
+  } else {
+    closeAnnouncements();
+  }
+}
+
+function closeAnnouncements(e) {
+  if (e && e.target !== document.getElementById('ann-overlay')) return;
+  const overlay = document.getElementById('ann-overlay');
+  if (overlay) overlay.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function renderAnnouncements() {
+  const list = document.getElementById('ann-list');
+  if (!list) return;
+  if (typeof ANNOUNCEMENTS === 'undefined' || !ANNOUNCEMENTS.length) {
+    list.innerHTML = '<div class="ann-empty">No announcements yet</div>';
+    return;
+  }
+
+  const CAT_COLORS = {
+    'Urgent':  { bg:'#FEE2E2', border:'#C8242A', text:'#C8242A' },
+    'Promo':   { bg:'#FDF5E4', border:'#B07D1A', text:'#B07D1A' },
+    'Product': { bg:'#EDF2FB', border:'#163C70', text:'#163C70' },
+    'General': { bg:'#F4F4F6', border:'#AEAEB8', text:'#54545E' },
+  };
+
+  list.innerHTML = ANNOUNCEMENTS.map(a => {
+    const c = CAT_COLORS[a.category] || CAT_COLORS['General'];
+    const d = new Date(a.date).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'2-digit' });
+    return `<div class="ann-card" style="border-left:3px solid ${c.border}">
+      <div class="ann-card-top">
+        <span class="ann-cat" style="background:${c.bg};color:${c.text}">${a.category}</span>
+        <span class="ann-date">${d} · ${a.author}</span>
+      </div>
+      <div class="ann-title">${a.title}</div>
+      <div class="ann-msg">${a.message}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── INIT ──
