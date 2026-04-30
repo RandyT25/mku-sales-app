@@ -432,11 +432,13 @@ function renderTarget() {
 
   const bars = [];
   if (multiArea) {
-    const areaColors = ['#C8242A','#163C70','#1A7A45','#B07D1A'];
+    // Lani: show Food + Beverage bar for EACH area
+    const areaColors = [['#C8242A','#163C70'], ['#1A7A45','#B07D1A']];
     myMainAreas.forEach((a, i) => {
-      const at = (a.food_target||0) + (a.bev_target||0);
-      const aa = (a.food_ach||0)   + (a.bev_ach||0);
-      if (at > 0) bars.push({ label: a.area.replace('KUTA - ','').replace('KUTA SEL - ',''), ach: aa, tgt: at, color: areaColors[i % areaColors.length] });
+      const aLabel = a.area.replace('KUTA - ','').replace('KUTA SEL - ','');
+      const colors = areaColors[i % areaColors.length];
+      if ((a.food_target||0) > 0) bars.push({ label: aLabel + ' · Food',     ach: a.food_ach||0, tgt: a.food_target||0, color: colors[0] });
+      if ((a.bev_target||0)  > 0) bars.push({ label: aLabel + ' · Beverage', ach: a.bev_ach||0,  tgt: a.bev_target||0,  color: colors[1] });
     });
   } else {
     if (food_target > 0)  bars.push({ label:'Food',     ach:food_ach, tgt:food_target, color:'#C8242A' });
