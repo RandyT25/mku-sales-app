@@ -44,6 +44,10 @@
     </div>
     <div class="topbar-right">
       <div class="topbar-date" id="topbar-date">—</div>
+      <button class="bell-btn" id="bell-btn" onclick="toggleAnnouncements()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="bell-badge hidden" id="bell-badge">0</div>
+      </button>
     </div>
   </header>
 
@@ -99,39 +103,71 @@
     </div>
 
     <div class="screen" id="screen-catalog">
-      <div class="catalog-wrap">
-        <div class="catalog-header">
-          <div class="catalog-title">Product Catalogs</div>
-          <div class="catalog-sub">Tap to open · Use phone share button to share</div>
+      <div class="toolkit-wrap">
+
+        <div class="toolkit-tabs">
+          <button class="tk-tab active" id="tktab-catalogs"  onclick="switchToolkit('catalogs',this)">📚 Catalogs</button>
+          <button class="tk-tab"        id="tktab-spotlight" onclick="switchToolkit('spotlight',this)">🌟 Spotlight</button>
+          <button class="tk-tab"        id="tktab-faq"       onclick="switchToolkit('faq',this)">❓ FAQ</button>
+          <button class="tk-tab"        id="tktab-battle"    onclick="switchToolkit('battle',this)">⚔️ Battle</button>
+          <button class="tk-tab"        id="tktab-modules"   onclick="switchToolkit('modules',this)">📖 Modules</button>
         </div>
-        <a class="catalog-card mku-card" href="MKU Catalog 2026.pdf" target="_blank">
-          <div class="catalog-card-logo">
-            <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKU" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKU)" letter-spacing="-3">mku</text></svg>
-          </div>
-          <div class="catalog-card-info">
-            <div class="catalog-card-name">MKU Catalog 2026</div>
-            <div class="catalog-card-sub">PT. Mandala Kriya Utama · 64 pages</div>
-          </div>
-          <div class="catalog-card-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </div>
-        </a>
-        <a class="catalog-card mks-card" href="MKS Catalog 2026.pdf" target="_blank">
-          <div class="catalog-card-logo">
-            <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKS" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKS)" letter-spacing="-3">mks</text></svg>
-          </div>
-          <div class="catalog-card-info">
-            <div class="catalog-card-name">MKS Catalog 2026</div>
-            <div class="catalog-card-sub">PT. Mandala Kriya Semesta · 45 pages</div>
-          </div>
-          <div class="catalog-card-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </div>
-        </a>
-        <div class="catalog-tip">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          To share: open the PDF then use your phone's share button
+        <div class="tk-lang-bar" id="tk-lang-bar" style="display:none">
+          <span class="tk-lang-label">Language / Bahasa</span>
+          <button class="tk-lang-btn" id="tk-lang-btn" onclick="toggleTkLang()">🇮🇩 Bahasa</button>
         </div>
+
+        <div class="toolkit-section active" id="tksec-catalogs">
+          <a class="catalog-card mku-card" href="MKU Catalog 2026.pdf" target="_blank">
+            <div class="catalog-card-logo">
+              <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKU" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#D4262B"/><stop offset="100%" style="stop-color:#8B0000"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKU)" letter-spacing="-3">mku</text></svg>
+            </div>
+            <div class="catalog-card-info">
+              <div class="catalog-card-name">MKU Catalog 2026</div>
+              <div class="catalog-card-sub">PT. Mandala Kriya Utama · 64 pages</div>
+            </div>
+            <div class="catalog-card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+          </a>
+          <a class="catalog-card mks-card" href="MKS Catalog 2026.pdf" target="_blank">
+            <div class="catalog-card-logo">
+              <svg viewBox="0 0 200 72" class="catalog-logo-svg"><defs><linearGradient id="cMKS" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6EC6F5"/><stop offset="100%" style="stop-color:#1A6FC8"/></linearGradient></defs><text x="2" y="62" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="66" fill="url(#cMKS)" letter-spacing="-3">mks</text></svg>
+            </div>
+            <div class="catalog-card-info">
+              <div class="catalog-card-name">MKS Catalog 2026</div>
+              <div class="catalog-card-sub">PT. Mandala Kriya Semesta · 45 pages</div>
+            </div>
+            <div class="catalog-card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+          </a>
+          <div class="catalog-tip">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            To share: open the PDF then use your phone's share button
+          </div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-spotlight">
+          <div id="spotlight-list"></div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-faq">
+          <div class="tk-search-wrap">
+            <svg class="pl-search-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="pl-search" id="faq-search" type="search" placeholder="Search FAQ…" oninput="filterFAQ(this.value)" autocomplete="off">
+          </div>
+          <div id="faq-list"></div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-battle">
+          <div id="battle-list"></div>
+        </div>
+
+        <div class="toolkit-section hidden" id="tksec-modules">
+          <div id="modules-list"></div>
+        </div>
+
       </div>
     </div>
 
@@ -156,8 +192,8 @@
       <span>Stock</span>
     </button>
     <button class="bnav" id="bnav-catalog" onclick="switchTab('catalog')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>Catalog</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>Toolkit</span>
     </button>
   </nav>
 
@@ -187,6 +223,8 @@
 
 <script src="products.js"></script>
 <script src="stock_map.js"></script>
+<script src="announcements.js"></script>
+<script src="toolkit.js"></script>
 <script>
 // ── STEP 1: Animate the loading bar ──
 let _barTimer = (function() {
@@ -259,13 +297,24 @@ function _dataFailed() {
   );
 }
 
-// Try slim file first
+// Always fetch from dashboard repo
 _loadScript(
   'https://randyt25.github.io/MKU-MKS-Area-Dashboard/data_sales.js',
   _dataLoaded,
   _dataFailed
 );
 </script>
+
+<!-- ANNOUNCEMENT PANEL -->
+<div class="ann-overlay hidden" id="ann-overlay" onclick="closeAnnouncements(event)">
+  <div class="ann-panel" id="ann-panel">
+    <div class="ann-panel-header">
+      <div class="ann-panel-title">Announcements</div>
+      <button class="ann-close" onclick="closeAnnouncements()">✕</button>
+    </div>
+    <div class="ann-list" id="ann-list"></div>
+  </div>
+</div>
 
 <!-- INSTALL BANNER -->
 <div class="install-banner hidden" id="install-banner">

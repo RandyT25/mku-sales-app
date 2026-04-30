@@ -317,86 +317,32 @@ function renderTarget() {
     nn_ach    = myNNArea.food_ach    || 0;
   }
 
-  // ── TOTALS & PCT ──
-  // Main area totals (no NN)
-  const main_target = food_target + bev_target;
-  const main_ach    = food_ach + bev_ach;
-  const main_pct    = main_target > 0 ? Math.round(main_ach / main_target * 100) : 0;
-
-  // NN totals separate
-  const nn_pct = nn_target > 0 ? Math.round(nn_ach / nn_target * 100) : 0;
-
-  // Overall (main + NN combined) for gap card
-  const total_target = main_target + nn_target;
-  const total_ach    = main_ach + nn_ach;
-  const overall_pct  = total_target > 0 ? Math.round(total_ach / total_target * 100) : 0;
+  const total_target = food_target + bev_target + nn_target;
+  const total_ach    = food_ach + bev_ach + nn_ach;
+  const overall_pct  = total_target > 0 ? Math.round((total_ach / total_target) * 100) : 0;
 
   const gap80  = Math.max(0, total_target * 0.80 - total_ach);
   const gap100 = Math.max(0, total_target - total_ach);
+  const tagCls = pctTag(overall_pct);
+  const tagLabel = overall_pct >= 100 ? '🎉 Target Hit!' : overall_pct >= 80 ? '🔥 Almost there' : overall_pct >= 50 ? '📈 On Track' : '⚡ Push harder';
+
+  // Build mini cards
   const multiArea = myMainAreas.length > 1;
-
-  // ── HERO PCT DISPLAY ──
-  // For Lani (multi-area): show 2 area percentages side by side
-  // For Made/Sujana (NN): show Overall % + NN % side by side
-  // For regular reps: show single overall %
-
-  let heroOverallHtml = '';
-  if (multiArea) {
-    // Lani: show each area pct separately
-    heroOverallHtml = myMainAreas.map(a => {
-      const at = (a.food_target||0) + (a.bev_target||0);
-      const aa = (a.food_ach||0) + (a.bev_ach||0);
-      const ap = at > 0 ? Math.round(aa/at*100) : 0;
-      const aLabel = a.area.replace('KUTA - ','').replace('KUTA SEL - ','');
-      const tagL = ap >= 100 ? '🎉 Hit!' : ap >= 80 ? '🔥 Almost' : ap >= 50 ? '📈 On Track' : '⚡ Push';
-      return '<div style="text-align:center">' +
-        '<div class="th-pct" style="color:' + pctColor(ap) + '">' + ap + '%</div>' +
-        '<div class="th-pct-label">' + aLabel + '</div>' +
-        '<div class="th-status-tag ' + pctTag(ap) + '" style="margin-top:4px">' + tagL + '</div>' +
-        '</div>';
-    }).join('<div style="width:1px;background:rgba(255,255,255,0.1);margin:0 8px;align-self:stretch"></div>');
-  } else if (nn_target > 0) {
-    // Made / Sujana: Overall + NN separately
-    const tagMain = main_pct >= 100 ? '🎉 Hit!' : main_pct >= 80 ? '🔥 Almost' : main_pct >= 50 ? '📈 On Track' : '⚡ Push';
-    const tagNN   = nn_pct   >= 100 ? '🎉 Hit!' : nn_pct   >= 80 ? '🔥 Almost' : nn_pct   >= 50 ? '📈 On Track' : '⚡ Push';
-    heroOverallHtml =
-      '<div style="text-align:center">' +
-        '<div class="th-pct" style="color:' + pctColor(main_pct) + '">' + main_pct + '%</div>' +
-        '<div class="th-pct-label">Overall</div>' +
-        '<div class="th-status-tag ' + pctTag(main_pct) + '" style="margin-top:4px">' + tagMain + '</div>' +
-      '</div>' +
-      '<div style="width:1px;background:rgba(255,255,255,0.1);margin:0 8px;align-self:stretch"></div>' +
-      '<div style="text-align:center">' +
-        '<div class="th-pct" style="color:' + pctColor(nn_pct) + ';font-size:1.8rem">' + nn_pct + '%</div>' +
-        '<div class="th-pct-label">N. Nuris</div>' +
-        '<div class="th-status-tag ' + pctTag(nn_pct) + '" style="margin-top:4px">' + tagNN + '</div>' +
-      '</div>';
-  } else {
-    // Regular rep: single pct
-    const tagLabel = overall_pct >= 100 ? '🎉 Target Hit!' : overall_pct >= 80 ? '🔥 Almost there' : overall_pct >= 50 ? '📈 On Track' : '⚡ Push harder';
-    heroOverallHtml =
-      '<div><div class="th-pct" style="color:' + pctColor(overall_pct) + '">' + overall_pct + '%</div>' +
-      '<div class="th-pct-label">Overall</div></div>' +
-      '<div><div class="th-status-tag ' + pctTag(overall_pct) + '">' + tagLabel + '</div>' +
-      '<div style="color:rgba(255,255,255,0.35);font-size:.68rem;margin-top:6px">' + fmtShort(total_ach) + ' of ' + fmtShort(total_target) + '</div></div>';
-  }
-
-  // ── MINI CARDS ──
   let miniCardsHtml = '';
+
   if (multiArea) {
-    // Lani: each area split into Food + Beverage
+    // Multiple areas (e.g. Lani): show each area separately
     myMainAreas.forEach(a => {
+      const at = (a.food_target||0) + (a.bev_target||0);
+      const aa = (a.food_ach||0)   + (a.bev_ach||0);
+      const ap = at > 0 ? Math.round(aa / at * 100) : 0;
+      // Shorten area label
       const aLabel = a.area.replace('KUTA - ','').replace('KUTA SEL - ','');
-      if (a.food_target > 0) miniCardsHtml +=
-        '<div class="th-mini">' +
-        '<div class="th-mini-label" style="font-size:.52rem">' + aLabel + ' · Food</div>' +
-        '<div class="th-mini-val">' + fmtShort(a.food_ach) + '</div>' +
-        '<div class="th-mini-pct" style="color:' + pctColor(Math.round(a.food_ach/a.food_target*100)) + '">' + Math.round(a.food_ach/a.food_target*100) + '%</div></div>';
-      if (a.bev_target > 0) miniCardsHtml +=
-        '<div class="th-mini">' +
-        '<div class="th-mini-label" style="font-size:.52rem">' + aLabel + ' · Bev</div>' +
-        '<div class="th-mini-val">' + fmtShort(a.bev_ach) + '</div>' +
-        '<div class="th-mini-pct" style="color:' + pctColor(Math.round(a.bev_ach/a.bev_target*100)) + '">' + Math.round(a.bev_ach/a.bev_target*100) + '%</div></div>';
+      miniCardsHtml += '<div class="th-mini">' +
+        '<div class="th-mini-label" style="font-size:.55rem">' + aLabel + '</div>' +
+        '<div class="th-mini-val">' + fmtShort(aa) + '</div>' +
+        '<div class="th-mini-pct" style="color:' + pctColor(ap) + '">' + ap + '%</div>' +
+        '</div>';
     });
   } else {
     if (food_target > 0) miniCardsHtml +=
@@ -407,21 +353,28 @@ function renderTarget() {
       '<div class="th-mini"><div class="th-mini-label">Beverage</div>' +
       '<div class="th-mini-val">' + fmtShort(bev_ach) + '</div>' +
       '<div class="th-mini-pct" style="color:' + pctColor(Math.round(bev_ach/bev_target*100)) + '">' + Math.round(bev_ach/bev_target*100) + '%</div></div>';
-    if (nn_target > 0) miniCardsHtml +=
-      '<div class="th-mini"><div class="th-mini-label">N. Nuris</div>' +
-      '<div class="th-mini-val">' + fmtShort(nn_ach) + '</div>' +
-      '<div class="th-mini-pct" style="color:' + pctColor(nn_pct) + '">' + nn_pct + '%</div></div>';
   }
+  // Always show NN mini card if rep has Naughty Nuris
+  if (nn_target > 0) miniCardsHtml +=
+    '<div class="th-mini"><div class="th-mini-label">N. Nuris</div>' +
+    '<div class="th-mini-val">' + fmtShort(nn_ach) + '</div>' +
+    '<div class="th-mini-pct" style="color:' + pctColor(Math.round(nn_ach/nn_target*100)) + '">' + Math.round(nn_ach/nn_target*100) + '%</div></div>';
 
   // Hero
-  document.getElementById('target-hero').innerHTML =
-    '<div class="th-month">' + RAW.month + ' · as of ' + RAW.latest + '</div>' +
-    '<div class="th-rep">' + repName + '</div>' +
-    '<div class="th-overall" style="display:flex;align-items:center;gap:4px">' + heroOverallHtml + '</div>' +
-    (!multiArea && !nn_target ? '' :
-      '<div style="color:rgba(255,255,255,0.35);font-size:.65rem;text-align:center;margin-top:4px">' +
-      fmtShort(total_ach) + ' of ' + fmtShort(total_target) + ' total</div>') +
-    '<div class="th-mini-grid">' + miniCardsHtml + '</div>';
+  document.getElementById('target-hero').innerHTML = `
+    <div class="th-month">${RAW.month} · as of ${RAW.latest}</div>
+    <div class="th-rep">${repName}</div>
+    <div class="th-overall">
+      <div>
+        <div class="th-pct" style="color:${pctColor(overall_pct)}">${overall_pct}%</div>
+        <div class="th-pct-label">Overall</div>
+      </div>
+      <div>
+        <div class="th-status-tag ${tagCls}">${tagLabel}</div>
+        <div style="color:rgba(255,255,255,0.35);font-size:.68rem;margin-top:6px">${fmtShort(total_ach)} of ${fmtShort(total_target)}</div>
+      </div>
+    </div>
+    <div class="th-mini-grid">${miniCardsHtml}</div>`;
 
   let bodyHtml = '';
 
@@ -432,13 +385,11 @@ function renderTarget() {
 
   const bars = [];
   if (multiArea) {
-    // Lani: show Food + Beverage bar for EACH area
-    const areaColors = [['#C8242A','#163C70'], ['#1A7A45','#B07D1A']];
+    const areaColors = ['#C8242A','#163C70','#1A7A45','#B07D1A'];
     myMainAreas.forEach((a, i) => {
-      const aLabel = a.area.replace('KUTA - ','').replace('KUTA SEL - ','');
-      const colors = areaColors[i % areaColors.length];
-      if ((a.food_target||0) > 0) bars.push({ label: aLabel + ' · Food',     ach: a.food_ach||0, tgt: a.food_target||0, color: colors[0] });
-      if ((a.bev_target||0)  > 0) bars.push({ label: aLabel + ' · Beverage', ach: a.bev_ach||0,  tgt: a.bev_target||0,  color: colors[1] });
+      const at = (a.food_target||0) + (a.bev_target||0);
+      const aa = (a.food_ach||0)   + (a.bev_ach||0);
+      if (at > 0) bars.push({ label: a.area.replace('KUTA - ','').replace('KUTA SEL - ',''), ach: aa, tgt: at, color: areaColors[i % areaColors.length] });
     });
   } else {
     if (food_target > 0)  bars.push({ label:'Food',     ach:food_ach, tgt:food_target, color:'#C8242A' });
@@ -1162,10 +1113,30 @@ function renderStock() {
   document.getElementById('stock-list').innerHTML = h;
 }
 
-// ════════════════
-// TOOLKIT
-// ════════════════
+// ════════════════════════════════════════════════
+// TOOLKIT — with bilingual support (EN / ID)
+// ════════════════════════════════════════════════
 let activeToolkitSection = 'catalogs';
+let tkLang = 'en'; // 'en' or 'id'
+
+// Helper: resolve a string or {en, id} object
+function tl(val) {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  return val[tkLang] || val['en'] || '';
+}
+
+function toggleTkLang() {
+  tkLang = tkLang === 'en' ? 'id' : 'en';
+  // Update toggle button label
+  const btn = document.getElementById('tk-lang-btn');
+  if (btn) btn.textContent = tkLang === 'en' ? '🇮🇩 Bahasa' : '🇬🇧 English';
+  // Re-render current section
+  if (activeToolkitSection === 'spotlight') renderSpotlight();
+  if (activeToolkitSection === 'faq')       renderFAQ(document.getElementById('faq-search')?.value || '');
+  if (activeToolkitSection === 'battle')    renderBattleCards();
+  if (activeToolkitSection === 'modules')   renderModules();
+}
 
 function switchToolkit(section, btn) {
   activeToolkitSection = section;
@@ -1178,8 +1149,14 @@ function switchToolkit(section, btn) {
   if (section === 'spotlight') renderSpotlight();
   if (section === 'faq')       renderFAQ('');
   if (section === 'battle')    renderBattleCards();
+  if (section === 'modules')   renderModules();
+
+  // Show/hide lang toggle — not needed for catalogs
+  const langBar = document.getElementById('tk-lang-bar');
+  if (langBar) langBar.style.display = section === 'catalogs' ? 'none' : 'flex';
 }
 
+// ── SPOTLIGHT ──
 function renderSpotlight() {
   const el = document.getElementById('spotlight-list');
   if (!el || typeof TOOLKIT === 'undefined') return;
@@ -1192,24 +1169,26 @@ function renderSpotlight() {
 
   el.innerHTML = items.map(item => {
     const focusBadge = item.focus
-      ? '<span class="tk-focus-badge">This Months Focus</span>'
+      ? `<span class="tk-focus-badge">${tkLang === 'id' ? 'Fokus Bulan Ini' : "This Month's Focus"}</span>`
       : '';
+    const pitchLbl   = tkLang === 'id' ? 'Cara Jual' : 'The Pitch';
+    const targetLbl  = tkLang === 'id' ? 'Target Customer' : 'Target Customer';
     return `<div class="tk-card spotlight-card">
       ${focusBadge}
-      <div class="tk-card-category">${item.category}</div>
+      <div class="tk-card-category">${tl(item.category)}</div>
       <div class="tk-card-title">${item.product}</div>
-      <div class="tk-card-tagline">${item.tagline}</div>
-      <div class="tk-section-lbl">The Pitch</div>
-      <div class="tk-card-body">${item.pitch}</div>
-      <div class="tk-section-lbl">Target Customer</div>
-      <div class="tk-card-body">${item.target}</div>
+      <div class="tk-card-tagline">${tl(item.tagline)}</div>
+      <div class="tk-section-lbl">${pitchLbl}</div>
+      <div class="tk-card-body">${tl(item.pitch)}</div>
+      <div class="tk-section-lbl">${targetLbl}</div>
+      <div class="tk-card-body">${tl(item.target)}</div>
       <div class="tk-tip-box">
         <div class="tk-tip-ico">💡</div>
-        <div class="tk-tip-txt">${item.tip}</div>
+        <div class="tk-tip-txt">${tl(item.tip)}</div>
       </div>
       <button class="tk-share-btn" onclick="shareSpotlight(${item.id})">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Share with Customer
+        ${tkLang === 'id' ? 'Bagikan ke Customer' : 'Share with Customer'}
       </button>
     </div>`;
   }).join('');
@@ -1221,17 +1200,18 @@ function shareSpotlight(id) {
   if (!item) return;
   const lines = [
     '*' + item.product + '*',
-    item.tagline,
+    tl(item.tagline),
     '',
-    item.pitch,
+    tl(item.pitch),
     '',
-    'Target: ' + item.target,
+    (tkLang === 'id' ? 'Target: ' : 'Target: ') + tl(item.target),
     '',
     'Order: +62 822-3661-7866 | order@ptmku.com'
   ];
   window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
 }
 
+// ── FAQ ──
 function renderFAQ(query) {
   const el = document.getElementById('faq-list');
   if (!el || typeof TOOLKIT === 'undefined') return;
@@ -1240,51 +1220,106 @@ function renderFAQ(query) {
   if (query) {
     const q = query.toLowerCase();
     items = items.filter(f =>
-      f.question.toLowerCase().includes(q) ||
-      f.answer.toLowerCase().includes(q)
+      tl(f.question).toLowerCase().includes(q) ||
+      tl(f.answer).toLowerCase().includes(q)
     );
   }
 
   if (!items.length) {
-    el.innerHTML = '<div class="tk-empty">No results found</div>';
+    el.innerHTML = `<div class="tk-empty">${tkLang === 'id' ? 'Tidak ada hasil' : 'No results found'}</div>`;
     return;
   }
 
   el.innerHTML = items.map(f => `
     <div class="tk-faq-card" onclick="this.classList.toggle('open')">
       <div class="tk-faq-q">
-        <span>${f.question}</span>
+        <span>${tl(f.question)}</span>
         <svg class="tk-faq-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div class="tk-faq-a">${f.answer}</div>
+      <div class="tk-faq-a">${tl(f.answer)}</div>
     </div>`).join('');
 }
 
 function filterFAQ(val) { renderFAQ(val); }
 
+// ── BATTLECARDS ──
 function renderBattleCards() {
   const el = document.getElementById('battle-list');
   if (!el || typeof TOOLKIT === 'undefined') return;
 
   const items = TOOLKIT.battlecards || [];
   if (!items.length) {
-    el.innerHTML = '<div class="tk-empty">No battle cards yet</div>';
+    el.innerHTML = `<div class="tk-empty">${tkLang === 'id' ? 'Belum ada battle card' : 'No battle cards yet'}</div>`;
     return;
   }
 
-  el.innerHTML = items.map(b => `
+  const sitLbl  = tkLang === 'id' ? 'Situasi' : 'Situation';
+  const respLbl = tkLang === 'id' ? 'Respons Anda' : 'Your Response';
+  const kpLbl   = tkLang === 'id' ? 'Poin Kunci' : 'Key Points';
+
+  el.innerHTML = items.map(b => {
+    const kp = Array.isArray(tl(b.keypoints)) ? tl(b.keypoints) : (b.keypoints[tkLang] || b.keypoints['en'] || []);
+    return `
     <div class="tk-card battle-card">
       <div class="tk-battle-situation">
-        <span class="tk-battle-label">Situation</span>
-        ${b.situation}
+        <span class="tk-battle-label">${sitLbl}</span>
+        ${tl(b.situation)}
       </div>
-      <div class="tk-section-lbl">Your Response</div>
-      <div class="tk-card-body">${b.response}</div>
-      <div class="tk-section-lbl">Key Points</div>
+      <div class="tk-section-lbl">${respLbl}</div>
+      <div class="tk-card-body">${tl(b.response)}</div>
+      <div class="tk-section-lbl">${kpLbl}</div>
       <ul class="tk-battle-points">
-        ${b.keypoints.map(p => '<li>' + p + '</li>').join('')}
+        ${kp.map(p => '<li>' + p + '</li>').join('')}
       </ul>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+// ── MODULES ──
+function renderModules() {
+  const el = document.getElementById('modules-list');
+  if (!el || typeof TOOLKIT === 'undefined') return;
+
+  const items = TOOLKIT.modules || [];
+  if (!items.length) {
+    el.innerHTML = `<div class="tk-empty">${tkLang === 'id' ? 'Belum ada modul' : 'No modules yet'}</div>`;
+    return;
+  }
+
+  el.innerHTML = items.map(mod => {
+    const divBadgeClass = mod.division === 'MKU' ? 'tk-mod-div-mku' : 'tk-mod-div-mks';
+    const sections = (mod.sections || []).map(sec => `
+      <div class="tk-mod-section">
+        <div class="tk-mod-sec-heading">${tl(sec.heading)}</div>
+        <div class="tk-mod-sec-content">${tl(sec.content).replace(/\n/g, '<br>')}</div>
+      </div>`).join('');
+
+    return `
+    <div class="tk-mod-card" style="border-left-color:${mod.color}">
+      <div class="tk-mod-header" onclick="toggleModule(${mod.id})">
+        <div class="tk-mod-header-left">
+          <span class="tk-mod-icon">${mod.icon}</span>
+          <div>
+            <div class="tk-mod-title">${tl(mod.title)}</div>
+            <span class="tk-mod-div-badge ${divBadgeClass}">${mod.division}</span>
+          </div>
+        </div>
+        <svg class="tk-mod-chev" id="tk-mod-chev-${mod.id}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="tk-mod-body hidden" id="tk-mod-body-${mod.id}">
+        ${sections}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleModule(id) {
+  const body = document.getElementById('tk-mod-body-' + id);
+  const chev = document.getElementById('tk-mod-chev-' + id);
+  if (!body) return;
+  const isOpen = !body.classList.contains('hidden');
+  body.classList.toggle('hidden', isOpen);
+  if (chev) chev.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
 // ════════════════
