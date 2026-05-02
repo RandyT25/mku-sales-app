@@ -140,6 +140,28 @@ var TOOLKIT = {
         id: "Jika mereka membuat croissant atau puff pastry — ini adalah pilihan yang tepat. Posisikan bersama Hime: Hime untuk roti, Double Zero untuk pastry."
       },
       focus: false
+    },
+    {
+      id: 7,
+      product: "Canary Lactic Butter Sheets 10kg",
+      category: { en: "Dairy", id: "Dairy" },
+      tagline: {
+        en: "New Zealand grass-fed butter sheets — no tempering, straight from the chiller",
+        id: "Butter sheet grass-fed New Zealand — tidak perlu tempering, langsung dari chiller"
+      },
+      pitch: {
+        en: "Canary Butter Sheets are pre-cut lactic butter sheets from New Zealand grass-fed cows, designed for laminated pastry — croissants, danishes, puff pastry. The key advantage: use directly from the chiller, no tempering required. This saves significant time in a professional kitchen. Real client feedback: croissants made with Canary stayed crunchy from 5.30pm oven until taken home — exceptional shelf life for laminated pastry.",
+        id: "Canary Butter Sheets adalah lembaran butter laktis yang sudah dipotong dari sapi grass-fed New Zealand, dirancang untuk pastry berlapis — croissant, danish, puff pastry. Keunggulan utama: bisa langsung digunakan dari chiller, tidak perlu tempering. Ini menghemat waktu signifikan di dapur profesional. Feedback klien nyata: croissant yang dibuat dengan Canary tetap crunchy dari oven jam 5.30 sampai dibawa pulang — shelf life luar biasa untuk pastry berlapis."
+      },
+      target: {
+        en: "Premium bakery, hotel pastry kitchen, croissant specialist, café with laminated pastry menu",
+        id: "Bakery premium, dapur pastry hotel, spesialis croissant, café dengan menu pastry berlapis"
+      },
+      tip: {
+        en: "Ask if their current butter needs tempering before use. If yes — Canary eliminates that step entirely. Time saved = money saved. The yellow colour from beta-carotene is also a natural quality signal that chefs recognise.",
+        id: "Tanyakan apakah butter mereka sekarang perlu di-temper sebelum digunakan. Jika ya — Canary menghilangkan langkah itu sepenuhnya. Waktu yang dihemat = uang yang dihemat. Warna kuning dari beta-karoten juga merupakan sinyal kualitas alami yang dikenali chef."
+      },
+      focus: true
     }
   ],
 
@@ -255,6 +277,28 @@ var TOOLKIT = {
       answer: {
         en: "Sushi Vinegar 5L is pre-balanced — no need to mix rice vinegar, sugar, and salt separately. Just pour over hot rice for consistent shari every time. Mirin Fu 5L is a mirin substitute that provides the same sweet glaze and aroma for teriyaki and sukiyaki without the need to balance sweetness manually. Both reduce prep time and inconsistency in high-volume kitchens.",
         id: "Sushi Vinegar 5L sudah seimbang — tidak perlu mencampur cuka beras, gula, dan garam secara terpisah. Cukup tuangkan ke nasi panas untuk shari yang konsisten setiap saat. Mirin Fu 5L adalah pengganti mirin yang memberikan glaze manis dan aroma yang sama untuk teriyaki dan sukiyaki tanpa perlu menyeimbangkan rasa manis secara manual. Keduanya mengurangi waktu persiapan dan inkonsistensi di dapur volume tinggi."
+      }
+    },
+    {
+      id: 11,
+      question: {
+        en: "Why is Canary butter yellow?",
+        id: "Kenapa butter Canary warnanya kuning?"
+      },
+      answer: {
+        en: "Canary uses milk from New Zealand grass-fed cows. Grass contains beta-carotene (a natural yellow pigment), which is stored in the cows' fat and carried into the milk — producing naturally yellow butter. This is a quality indicator, not colouring. White butter typically comes from grain-fed cows with lower beta-carotene levels. When a chef asks about the colour, this is the story to tell.",
+        id: "Canary menggunakan susu dari sapi grass-fed New Zealand. Rumput mengandung beta-karoten (pigmen kuning alami), yang tersimpan dalam lemak sapi dan terbawa ke dalam susu — menghasilkan butter yang secara alami berwarna kuning. Ini adalah indikator kualitas, bukan pewarna. Butter putih biasanya berasal dari sapi yang diberi makan biji-bijian dengan kadar beta-karoten lebih rendah. Ketika chef bertanya tentang warnanya, inilah cerita yang harus disampaikan."
+      }
+    },
+    {
+      id: 12,
+      question: {
+        en: "What is the difference between Canary Butter Sheets, Butter Block 25kg, and Clarified Butter?",
+        id: "Apa perbedaan Canary Butter Sheets, Butter Block 25kg, dan Clarified Butter?"
+      },
+      answer: {
+        en: "Butter Sheets 10kg — Pre-cut lactic unsalted butter sheets, 82% fat, melt point 32–34°C. Designed for laminated pastry (croissants, danishes, puff pastry). Key advantage: use directly from chiller, no tempering needed. Best for: bakery, hotel pastry kitchen.\n\nButter Block 25kg — Lactic unsalted butter in 25kg rectangular block, 82% fat, wrapped in HDPE film. Best for: high-volume kitchen, industrial bakery, operations that process butter in bulk.\n\nClarified Butter 9.5kg — Butter with water and milk solids removed, concentrated pure butterfat. Higher smoke point — ideal for frying, roasting, barbecue, microwave cooking. Price is higher than regular butter but zero residue means zero wastage. Best for: restaurant kitchen, hotel cooking line.",
+        id: "Butter Sheets 10kg — Lembaran butter laktis unsalted yang sudah dipotong, lemak 82%, titik leleh 32–34°C. Dirancang untuk pastry berlapis (croissant, danish, puff pastry). Keunggulan utama: langsung digunakan dari chiller, tidak perlu tempering. Terbaik untuk: bakery, dapur pastry hotel.\n\nButter Block 25kg — Butter laktis unsalted dalam blok persegi panjang 25kg, lemak 82%, dibungkus film HDPE. Terbaik untuk: dapur volume tinggi, bakery industri, operasi yang memproses butter dalam jumlah besar.\n\nClarified Butter 9.5kg — Butter dengan air dan padatan susu dihilangkan, lemak butter murni yang terkonsentrasi. Titik asap lebih tinggi — ideal untuk menggoreng, memanggang, barbecue, memasak microwave. Harga lebih tinggi dari butter biasa tapi zero residu berarti zero pemborosan. Terbaik untuk: dapur restoran, lini memasak hotel."
       }
     }
   ],
@@ -412,6 +456,35 @@ var TOOLKIT = {
           "Tanyakan tentang shelf life / keluhan kesegaran dari customer mereka",
           "Tawarkan trial satu kantong — komitmen rendah, dampak tinggi",
           "EAPP User Development Framework: mulai dengan hasil, bukan spesifikasi produk"
+        ]
+      }
+    },
+    {
+      id: 7,
+      situation: {
+        en: "Chef/bakery says their current butter is fine and doesn't want to switch",
+        id: "Chef/bakery bilang butter mereka sekarang sudah oke dan tidak mau ganti"
+      },
+      response: {
+        en: "Don't position Canary as a replacement — position it as an upgrade for one specific product. Ask what their bestselling laminated pastry is. Then ask: 'Does your current butter need tempering before use?' If yes, that's the opening. Canary Sheets go straight from chiller to sheeting machine — zero waiting time. Real customer feedback: croissants still crunchy hours after coming out of the oven.",
+        id: "Jangan posisikan Canary sebagai pengganti — posisikan sebagai upgrade untuk satu produk spesifik. Tanyakan apa pastry berlapis terlaris mereka. Kemudian tanyakan: 'Apakah butter Anda sekarang perlu di-temper sebelum digunakan?' Jika ya, itu adalah pembukaan. Canary Sheets langsung dari chiller ke mesin sheeting — zero waktu tunggu. Feedback customer nyata: croissant masih crunchy berjam-jam setelah keluar dari oven."
+      },
+      keypoints: {
+        en: [
+          "Key question: 'Does your butter need tempering?' — if yes, Canary saves that step entirely",
+          "Canary Sheets: use directly from chiller, melt point 32–34°C, no tempering required",
+          "Real testimonial: croissants stayed crunchy from 5.30pm oven until taken home",
+          "Naturally yellow = grass-fed NZ milk = natural quality signal chefs recognise",
+          "Nutritional edge: rich in Vitamin D, high beta-carotene, high CLA levels",
+          "Trial approach: offer one carton of Sheets for their croissant/danish line only"
+        ],
+        id: [
+          "Pertanyaan kunci: 'Apakah butter Anda perlu di-temper?' — jika ya, Canary menghemat langkah itu sepenuhnya",
+          "Canary Sheets: langsung dari chiller, titik leleh 32–34°C, tidak perlu tempering",
+          "Testimoni nyata: croissant tetap crunchy dari oven jam 5.30 sampai dibawa pulang",
+          "Kuning alami = susu NZ grass-fed = sinyal kualitas yang dipercaya chef",
+          "Keunggulan gizi: kaya Vitamin D, beta-karoten tinggi, kadar CLA tinggi",
+          "Pendekatan trial: tawarkan satu karton Sheets untuk lini croissant/danish mereka saja"
         ]
       }
     }
@@ -634,6 +707,57 @@ var TOOLKIT = {
           content: {
             en: "Tier 1 — Ready to place trial order or full order\nTier 2 — Trial completed & validated, pending approval or additional trials\nTier 3 — Presentation & concept validated, trial timing dependent\n\nImportant: Do NOT negotiate price on the first visit — even for 50/100/200 carton trial orders. Market feedback takes 3–6 months after a trial order begins.",
             id: "Tier 1 — Siap melakukan trial order atau full order\nTier 2 — Trial selesai & tervalidasi, menunggu persetujuan atau trial tambahan\nTier 3 — Presentasi & konsep tervalidasi, timing trial tergantung situasi\n\nPenting: JANGAN negosiasi harga pada kunjungan pertama — bahkan untuk trial order 50/100/200 karton. Feedback pasar membutuhkan 3–6 bulan setelah trial order dimulai."
+          }
+        }
+      ]
+    },
+    {
+      id: 8,
+      title: { en: "Canary Butter (NZ) — Full Training", id: "Canary Butter (NZ) — Pelatihan Lengkap" },
+      division: "MKS",
+      color: "#D4A017",
+      icon: "🧈",
+      sections: [
+        {
+          heading: { en: "What is Canary?", id: "Apa itu Canary?" },
+          content: {
+            en: "Canary is a New Zealand grass-fed butter brand distributed in Indonesia by PT Pandurasa Kharisma. All Canary butter is made from milk from grass-fed cows — naturally producing yellow butter rich in beta-carotene, Vitamin D, and CLA (conjugated linoleic acid). Three products in the range: Clarified Butter 9.5kg, Lactic Butter Block 25kg, and Lactic Butter Sheets 10kg.",
+            id: "Canary adalah merek butter grass-fed New Zealand yang didistribusikan di Indonesia oleh PT Pandurasa Kharisma. Semua butter Canary dibuat dari susu sapi grass-fed — secara alami menghasilkan butter kuning kaya beta-karoten, Vitamin D, dan CLA (asam linoleat terkonjugasi). Tiga produk dalam rangkaian ini: Clarified Butter 9,5kg, Lactic Butter Block 25kg, dan Lactic Butter Sheets 10kg."
+          }
+        },
+        {
+          heading: { en: "Why Grass-Fed Matters", id: "Mengapa Grass-Fed Penting" },
+          content: {
+            en: "Grass-fed cows produce milk with higher levels of beta-carotene (natural yellow pigment), Vitamin D, and CLA. This translates to:\n✔ Naturally yellow butter — no artificial colouring\n✔ Richer, more distinct buttery aroma and flavour\n✔ Better nutritional profile vs grain-fed butter\n\nWhen a chef asks why the butter is yellow — this is not a defect. It is proof that the cows ate real grass. White butter = grain-fed cows = lower nutrient density.",
+            id: "Sapi grass-fed menghasilkan susu dengan kadar beta-karoten (pigmen kuning alami), Vitamin D, dan CLA yang lebih tinggi. Ini berarti:\n✔ Butter kuning alami — tanpa pewarna buatan\n✔ Aroma dan rasa butter yang lebih kaya dan khas\n✔ Profil gizi lebih baik vs butter dari sapi yang diberi makan biji-bijian\n\nKetika chef bertanya mengapa butternya kuning — ini bukan cacat. Ini adalah bukti bahwa sapi makan rumput asli. Butter putih = sapi diberi makan biji-bijian = kepadatan nutrisi lebih rendah."
+          }
+        },
+        {
+          heading: { en: "Product 1 — Lactic Butter Sheets 10kg", id: "Produk 1 — Lactic Butter Sheets 10kg" },
+          content: {
+            en: "Free-flow lactic butter sheets from NZ grass-fed cows. Fat 82%. Melt point 32–34°C. Sheets separated by HDPE film, packed in plastic liner bag and outer carton. Store below −9°C.\n\nBest for: Croissants, danishes, puff pastry, all laminated pastry.\n\nKey technical advantages:\n• Use directly from chiller — NO tempering required\n• Proofing temperature: 24–27°C\n• Increase yeast by 50–100% vs regular butter recipes\n• Consistent sheet thickness = consistent lamination every batch\n\nReal client testimonial: 'Untuk rasa oke, wangi nya khas, beda sama butter NZ yang saya coba' — and croissants were still crunchy hours after coming out of the oven at 5.30pm.",
+            id: "Lembaran butter laktis free-flow dari sapi NZ grass-fed. Lemak 82%. Titik leleh 32–34°C. Lembaran dipisahkan oleh film HDPE, dikemas dalam kantong plastik dan karton luar. Simpan di bawah −9°C.\n\nTerbaik untuk: Croissant, danish, puff pastry, semua pastry berlapis.\n\nKeunggulan teknis utama:\n• Langsung digunakan dari chiller — TIDAK perlu tempering\n• Suhu proofing: 24–27°C\n• Tingkatkan ragi 50–100% vs resep butter biasa\n• Ketebalan lembaran konsisten = laminasi konsisten setiap batch\n\nTestimoni klien nyata: 'Untuk rasa oke, wangi nya khas, beda sama butter NZ yang saya coba' — dan croissant masih crunchy berjam-jam setelah keluar dari oven jam 5.30."
+          }
+        },
+        {
+          heading: { en: "Product 2 — Lactic Butter Block 25kg", id: "Produk 2 — Lactic Butter Block 25kg" },
+          content: {
+            en: "NZ lactic unsalted butter packed in 25kg rectangular block. Fat 82%. Wrapped in HDPE film. Store below −9°C.\n\nBest for: High-volume bakery, industrial kitchen, operations processing butter in bulk.\n\nSelling point: Same NZ grass-fed quality as the sheets, in bulk format for kitchens that process and portion butter themselves.",
+            id: "Butter laktis unsalted NZ dalam blok persegi panjang 25kg. Lemak 82%. Dibungkus film HDPE. Simpan di bawah −9°C.\n\nTerbaik untuk: Bakery volume tinggi, dapur industri, operasi yang memproses butter dalam jumlah besar.\n\nSelling point: Kualitas NZ grass-fed yang sama dengan sheets, dalam format bulk untuk dapur yang memproses dan memotong butter sendiri."
+          }
+        },
+        {
+          heading: { en: "Product 3 — Clarified Butter 9.5kg", id: "Produk 3 — Clarified Butter 9,5kg" },
+          content: {
+            en: "Clarified butter = butter with water and milk solids removed. Pure concentrated butterfat. Higher smoke point than regular butter.\n\nBest for: Frying, roasting, barbecue, microwave cooking. Any application where butter burns at high heat.\n\nNote on price: Clarified butter costs more than regular butter — but zero residue means zero wastage. Cost per usable kg is actually competitive when calculated correctly. Use this argument when customer raises price concerns.",
+            id: "Clarified butter = butter dengan air dan padatan susu dihilangkan. Lemak butter murni yang terkonsentrasi. Titik asap lebih tinggi dari butter biasa.\n\nTerbaik untuk: Menggoreng, memanggang, barbecue, memasak microwave. Aplikasi apapun dimana butter gosong pada panas tinggi.\n\nCatatan soal harga: Clarified butter lebih mahal dari butter biasa — tapi zero residu berarti zero pemborosan. Biaya per kg yang bisa digunakan sebenarnya kompetitif jika dihitung dengan benar. Gunakan argumen ini ketika customer mempermasalahkan harga."
+          }
+        },
+        {
+          heading: { en: "Target Customers & Pitch by Type", id: "Target Customer & Pitch per Tipe" },
+          content: {
+            en: "Premium Bakery / Croissant Specialist → Lead with Butter Sheets. Ask about tempering. Offer one carton trial.\n\nHotel Pastry Kitchen → Lead with Sheets for laminated pastry, Block for bulk cooking. Emphasise consistency and NZ provenance.\n\nRestaurant Cooking Line → Lead with Clarified Butter. Position on smoke point and zero wastage.\n\nCasual Bakery / HORECA → Lead with the grass-fed story and yellow colour as a quality differentiator. Use the croissant testimonial.",
+            id: "Bakery Premium / Spesialis Croissant → Mulai dengan Butter Sheets. Tanyakan tentang tempering. Tawarkan trial satu karton.\n\nDapur Pastry Hotel → Mulai dengan Sheets untuk pastry berlapis, Block untuk memasak dalam jumlah besar. Tekankan konsistensi dan asal NZ.\n\nLini Memasak Restoran → Mulai dengan Clarified Butter. Posisikan pada titik asap dan zero pemborosan.\n\nBakery Casual / HORECA → Mulai dengan cerita grass-fed dan warna kuning sebagai pembeda kualitas. Gunakan testimoni croissant."
           }
         }
       ]
